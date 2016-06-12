@@ -7,11 +7,15 @@
 </head>
 <body>
  <audio controls autoplay loop style="display:none;">
-  <source src="data/sounds/boss.ogg" type="audio/ogg" >
-  Your browser does not support the audio element.
-</audio> 
+  	<source src="data/sounds/level4.ogg" type="audio/ogg" >
+  		Your browser does not support the audio element.
+	</audio> 
 	
 	<div id="board">
+		<div id="lifes"></div>
+		<div id="score">SCORE : <span id="score-player">00000000</span></div>
+		<div id="message">Level <span id="level-number"></span> is done ! <br/> Brace yourself,<br/> <span class="bigmessage">boss  is coming !</span></div>
+		<div id="enemy-wave"></div>
 		<div id="ship"> </div>
 	</div>
 	<script src="data/js/jquery.js"></script>
