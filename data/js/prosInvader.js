@@ -23,8 +23,16 @@ var directionAnimation = -1;
 // ---- is going to manage the bosses enemys
 
 // ---- to manage the score
-
 var score = 0;
+
+// ---- to manage the navigation (0: menu, 1:game, 2:scoreboard)
+var current_screen = 0;
+
+// ---- to manage the menu
+var menu = 1;
+
+
+
 
 $(document).ready(function() {
 	// Is going to set the right height for the board
@@ -47,13 +55,16 @@ $(document).ready(function() {
 		// No F5 allowed...
 		if ((e.which || e.keyCode) == 116 || (e.which || e.keyCode) == 82) e.preventDefault();
 		else if (e.keyCode == 32) shot();
+		else if (e.keyCode == 38) goUpMenu();
+		else if (e.keyCode == 40) goDownMenu();
+		else if(e.keyCode == 13) validateOnMenu();
 		else listOfKeysPressed[e.keyCode] = false;
 	});
 	
 	setInterval(function() {
-		if (listOfKeysPressed[81])
+		if (listOfKeysPressed[81] || listOfKeysPressed[37])
 			goLeft();
-		if (listOfKeysPressed[68])
+		if (listOfKeysPressed[68] || listOfKeysPressed[39])
 			goRight();
 	}, 5);
 	
@@ -81,8 +92,7 @@ $(document).ready(function() {
 		});
 	}, 100);
 	launchBackgroundAnimation();
-	createEnemysWave();
-	launchEnemyMove();
+	majUIMenu();
 });
 
 
@@ -208,6 +218,42 @@ function moveEnemyWave(){
 	});
 }
 
+//---- handle the move of the bloc enemys
+var shotEnemyThread = "";
+function launchEnemyShot(){
+	shotEnemyThread = setInterval(function(){ shotEnemy() }, 700);
+}
+
+// ---- is gonna be the enemy shotter
+function shotEnemy(){
+	var breakPoint = false;
+	for(i=0;i<5;i++){
+		for(j = 0; j < 11 ; j++){
+			var idenemy = "enemy-" + i + "-" + j;
+			if(enemysShip[idenemy] == true){
+				var result = Math.floor((Math.random() * 10) + 1); 
+				if(result == 1){
+					$('<div></div>')
+					.addClass('bullet-enemy')
+					.css({
+						left: 190 + 43 + (j*145) + "px",
+						top: yEnemyPosition + 87 + (i*100) + "px"
+					})
+					.appendTo($('#board'))
+					.animate({
+						top: 1500
+					},2500);
+					breakPoint = true;
+					break;
+				}
+				if(breakPoint){
+					return;
+				}
+			}
+		}
+	}
+}
+
 // ---- is gonna check every enemys of this wave... 
 //      if they are all dead it means that the level is done
 function checkEnemys(){
@@ -242,6 +288,19 @@ function checkEnemys(){
 	}	
 }
 
+// -- game control: 
+// ---- launch game
+function launchGame(){
+	$(".menu").css({"display":"none"});
+	$("#score").css({"display":"inline"});
+	$("#lifes").css({"display":"inline"});
+	
+	createEnemysWave();
+	launchEnemyMove();
+	launchEnemyShot();
+	
+}
+
 // -- util methods : 
 // ---- will resize the board height to match the screen size
 function putBoardOnFullSize(){
@@ -273,4 +332,29 @@ function launchBackgroundAnimation(){
 			}
 		});
 	}, 50);
+}
+
+function validateOnMenu(){
+	if(menu==1){
+		launchGame();
+	}
+}
+
+function goUpMenu(){
+	if(menu>1){
+		menu--;
+	}
+	majUIMenu();
+}
+
+function goDownMenu(){
+	if(menu<2){
+		menu++;
+	}
+	majUIMenu();
+}
+
+function majUIMenu(){
+	$(".choice").css({"color":"white"});
+	$("#choice_" + menu).css({"color":"red"});
 }

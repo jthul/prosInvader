@@ -6,13 +6,19 @@ html, body{background:black;padding:0px;margin:0px;font-family:prosInvader;}
 
 #board{position:relative;width:100%;margin:auto;background:#222;background:url("background.png");background-position:0px;overflow:hidden;}
 #ship{position:absolute;width:75px;height:90px;background-color:green;bottom:10px;left:930px;background:url("ship_2.png");}
-#enemy-wave{position:absolute;height:600px;left:100px;top:40px;display:none;}
-#score{position:absolute;right:10px;top:5px;font-size:21px;color:white;z-index:10;}
+#enemy-wave{position:absolute;height:600px;left:100px;top:40px;display:none;z-index:2;}
+#score{position:absolute;right:10px;top:5px;font-size:21px;color:white;z-index:10;display:none;}
 #message{text-shadow: 5px 5px #FF0000;position:absolute;width:1920px;margin-top:180px;text-align:center;font-size:85px;color:yellow;line-height: 155px;display:none;}
 #level-number{color:red;font-size:100px}
-#lifes{position:absolute;width:126px;height:45px;background:url("ship_life.png");right:0px;top:35px;}
+#lifes{position:absolute;width:126px;height:45px;background:url("ship_life.png");right:0px;top:35px; display:none;}
+#logo{position:absolute;width:1920px;height:554px;background-image: url('logo.png');z-index:2;background-repeat:no-repeat;background-position:center;}
+#menu{width:1920px; text-align:center; color:white; margin-top:570px; font-size:35px; }
+ul{list-style:none;}
+li{margin-top:25px;}
 
+#keyboard{width:200px;height:100px;background-image:url('keyboard.png');position:absolute;margin-left:900px;margin-top:710px;}
 
 .bullet {position:absolute;	width:20px;height:13px;background:red;background:url("bullet.png");z-index:1;}
+.bullet-enemy {position:absolute;	width:5px;height:13px;background:red;z-index:0;}
 .enemy{position:absolute;width:90px;height:90px;background-color:red;background:url("ship_enemy.png");}
 .bigmessage{font-size:120px;}
