@@ -11,7 +11,7 @@ html, body{background:black;padding:0px;margin:0px;font-family:prosInvader;}
 #message{text-shadow: 5px 5px #FF0000;position:absolute;width:1920px;margin-top:180px;text-align:center;font-size:85px;color:yellow;line-height: 155px;display:none;}
 #level-number{color:red;font-size:100px}
 #lifes{position:absolute;width:126px;height:45px;background:url("ship_life.png");right:0px;top:35px; display:none;}
-#logo{position:absolute;width:1920px;height:554px;background-image: url('logo.png');z-index:2;background-repeat:no-repeat;background-position:center;}
+#logo{position:absolute;width:1920px;height:554px;background-image: url('logoTshirt.png');z-index:2;background-repeat:no-repeat;background-position:center;}
 #menu{width:1920px; text-align:center; color:white; margin-top:570px; font-size:35px; }
 ul{list-style:none;}
 li{margin-top:25px;}

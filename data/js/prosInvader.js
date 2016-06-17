@@ -144,15 +144,16 @@ function shot(){
 								manageScore();
 								//
 								$("#"+idenemy).css({
-									"background-image":"none",
-									"border-radius":"50%",
-									"border":"1px solid #C5C5C5"
+									"background-image":"url('data/css/boom.png')",
+									"background-repeat":"no-repeat",
+									"background-size":"100%"
 								}).animate({
 									height: 0,
 									width:0,
+									"background-size":"25%",
 									left:"+=45",
 									top:"+=45",
-								}, 200,function() {
+								}, 500,function() {
 									$(this).remove();
 									checkEnemys();
 								});
