@@ -147,7 +147,7 @@ function shot(){
 									"background-image":"url('data/css/boom.png')",
 									"background-repeat":"no-repeat",
 									"background-size":"100%"
-								}).animate({
+								}).animate({ 
 									height: 0,
 									width:0,
 									"background-size":"25%",
