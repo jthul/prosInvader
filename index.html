@@ -7,9 +7,16 @@
 </head>
 <body>
  <audio controls autoplay loop style="display:none;">
-  	<source src="data/sounds/level4.ogg" type="audio/ogg" >
+  	<source src="data/sounds/theme.mp3" type="audio/mp3" >
   		Your browser does not support the audio element.
-	</audio> 
+	</audio > 
+	
+	<div id="bg-stars">
+	</div>
+	
+	
+	<div id="bg-planet">
+	</div>
 	
 	<div id="board">
 		<div id="logo" class="menu"></div>
@@ -27,9 +34,15 @@
 		<div id="lifes"></div>
 		<div id="score">SCORE : <span id="score-player">00000000</span></div>
 		<div id="message">Level <span id="level-number"></span> is done ! <br/> Brace yourself,<br/> <span class="bigmessage">boss  is coming !</span></div>
-		<div id="enemy-wave"></div>
+		<div id="gameOver">GAME OVER <br/> You loose...</div>
+		<div id="calque"></div>
+		
 		<div id="ship"> </div>
+		<div id="enemy-wave"></div>
+		
+		
 	</div>
+	<div id="hurt"></div>
 	<script src="data/js/jquery.js"></script>
 	<script src="data/js/prosInvader.js"></script>
 	
