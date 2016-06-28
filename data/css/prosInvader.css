@@ -17,6 +17,9 @@ html, body{background:black;padding:0px;margin:0px;font-family:prosInvader;}
 #lifes{position:absolute;width:126px;height:45px;background:url("ship_life.png");right:0px;top:35px; display:none;}
 #logo{position:absolute;width:1920px;height:554px;background-image: url('logoTshirt.png');z-index:2;background-repeat:no-repeat;background-position:center;}
 #menu{width:1920px; text-align:center; color:white; margin-top:570px; font-size:35px; }
+#boss{width:100%; height:300pxpx;position:absolute;}
+#enemy-boss1{width:500px;height:282px;display:none;position:absolute;left:760px;background-position:bottom;background-repeat:no-repeat;}
+
 ul{list-style:none;}
 li{margin-top:25px;}
 

@@ -21,20 +21,31 @@ var shipImgCpt = 1;
 var enemysShip = [];
 // ---- is going to manage the yPosition of the ennemy block
 var yEnemyPosition = 40;
+var yBossPosition = 0;
 var directionAnimation = -1;
+
+var directionAnimationBoss = -1;
 // ---- is going to manage the bosses enemys
 
 // ---- to manage the game
 var score = 0;
-var level = 1;
+var level = 0;
 var SHIP_SPEED = 1500;
 var gameLaunched = false;
 var lifes = 3;
+var gun = 1 // 1 : normal ; 2 : 3-shot ; 3 : rifle
+
+var bossNumber = 1;
+var bossLife = 10;
 // ---- to manage the navigation (0: menu, 1:game, 2:scoreboard)
 var current_screen = 0;
 
 // ---- to manage the menu
 var menu = 1;
+
+// --- some flags
+var isCreatingNewWave = false;
+var isBoss = false;
 
 var laser, laser2, laser3 = "";
 var cptLaser = 1;
@@ -87,6 +98,11 @@ $(document).ready(function() {
 	}, 5);
 
 	setInterval(function() {
+		$("#boss").animate({
+			"top" : shipYPosition + "px"
+		}, 400, function() {
+			
+		});
 		$("#ship").animate({
 			"bottom" : shipYPosition + "px"
 		}, 400, function() {
@@ -96,8 +112,9 @@ $(document).ready(function() {
 				shipYPosition = 10;
 			}
 		});
+		
 	}, 400);
-
+	
 	setInterval(function() {
 		if (shipImgCpt == 4) {
 			shipImgCpt = 0;
@@ -106,9 +123,10 @@ $(document).ready(function() {
 		$("#ship").css({
 			"background-image" : "url('data/css/ship_" + shipImgCpt + ".png')"
 		}, function() {
-
+			
 		});
 	}, 100);
+	
 	launchBackgroundAnimation();
 	majUIMenu();
 	 laser = document.createElement('audio');
@@ -234,6 +252,10 @@ function shot() {
 										}
 									}
 								}
+								
+								// Check if it touched the boss
+								
+								
 								// delete the bullet if it is out of the screen
 								if (now == -20) {
 									$(this).remove();
@@ -247,21 +269,110 @@ function shot() {
 // -- ia methods :
 // ---- create a wave of classic enemys
 function createEnemysWave() {
-	$("#enemy-wave").empty();
-	$("#enemy-wave").css({
-		"top" : "40px"
-	})
-	for (i = 0; i < 5; i++) {
-		for (j = 0; j < 11; j++) {
-			var idenemy = "enemy-" + i + "-" + j;
-			$('<div></div>').attr('id', idenemy).addClass('enemy').css({
-				left : 90 + (j * 145) + "px",
-				top : (i * 100) + "px"
-			}).appendTo($('#enemy-wave'));
-			enemysShip[idenemy] = true;
+	if(!isCreatingNewWave){
+		enemysShip = [];
+		isCreatingNewWave = true;
+		level++;
+		$("#enemy-wave").empty();
+		$("#enemy-wave").css({
+			"top" : "40px"
+		})
+		for (i = 0; i < 5; i++) {
+			for (j = 0; j < 11; j++) {
+				
+				/*
+				 * LEVEL 1 
+				 */
+				if(level == 1 ){
+					if(i < 3 && j > 2 && j < 9 ){
+						createEnemy(i,j);
+					}else{
+						var idenemy = "enemy-" + i + "-" + j;
+						enemysShip[idenemy] = false;
+					}
+				}
+				/*
+				 * LEVEL 2 
+				 */
+				else if(level == 2){
+					if(i <4 && j > 2 && j < 9 ){
+						createEnemy(i,j);
+						
+					}else{
+						var idenemy = "enemy-" + i + "-" + j;
+						enemysShip[idenemy] = false;
+					}
+				}
+				/*
+				 * BOSS 1
+				 */
+				else if(level == 3){
+					if(i > 2 && j > 1 && j < 10 ){
+						createEnemy(i,j);
+					}else{
+						var idenemy = "enemy-" + i + "-" + j;
+						enemysShip[idenemy] = false;
+					}
+				}
+				/*
+				 * LEVEL 4
+				 */
+				else if(level == 4){
+					if(j > 1 && j < 10 ){
+						createEnemy(i,j);
+					}else{
+						var idenemy = "enemy-" + i + "-" + j;
+						enemysShip[idenemy] = false;
+					}
+				}
+				/*
+				 * LEVEL 5 
+				 */
+				else if(level == 5){
+					if(j > 1 && j < 10 ){
+						createEnemy(i,j);
+					}else{
+						var idenemy = "enemy-" + i + "-" + j;
+						enemysShip[idenemy] = false;
+					}
+				}
+				/*
+				 * BOSS 2
+				 */
+				else if(level == 6){
+					createEnemy(i,j);
+				}
+				else{
+					
+					createEnemy(i,j);
+				}
+			}
 		}
+		
+		// Ajout du boss s'il existe
+		if(level == 3){
+			isBoss = true;
+			$("#enemy-boss1").css({
+				"background-image" : "url('data/css/boss1.png')"
+			}).fadeIn(1000, function(){
+				launchBossMove();
+			});
+		}
+		
+		$("#enemy-wave").fadeIn(1000, function(){
+			isCreatingNewWave = false;
+		});
 	}
-	$("#enemy-wave").fadeIn(1000);
+}
+
+
+function createEnemy(i,j){
+	var idenemy = "enemy-" + i + "-" + j;
+	$('<div></div>').attr('id', idenemy).addClass('enemy').css({
+		left : 90 + (j * 145) + "px",
+		top : (i * 100) + "px"
+	}).appendTo($('#enemy-wave'));
+	enemysShip[idenemy] = true;
 }
 // ---- handle the move of the bloc enemys
 var moveEnemyWaveThread = "";
@@ -272,21 +383,48 @@ function launchEnemyMove() {
 }
 
 function moveEnemyWave() {
-	yEnemyPosition += 15;
-	$("#enemy-wave").animate({
-		"top" : yEnemyPosition + "px",
-		"left" : "+=" + (directionAnimation * 15)
-	}, 200, function() {
+	if(!isCreatingNewWave){
 		yEnemyPosition += 15;
-		directionAnimation = directionAnimation * -1;
 		$("#enemy-wave").animate({
 			"top" : yEnemyPosition + "px",
 			"left" : "+=" + (directionAnimation * 15)
 		}, 200, function() {
+			yEnemyPosition += 15;
+			directionAnimation = directionAnimation * -1;
+			$("#enemy-wave").animate({
+				"top" : yEnemyPosition + "px",
+				"left" : "+=" + (directionAnimation * 15)
+			}, 200, function() {
+				
+			});
+		});
+	}else{
+		yEnemyPosition = 40;
+		//console.log("yEnemyPosition : " + yEnemyPosition);
+	}
+}
 
+//---- handle the move of the bloc boss
+var moveBossWaveThread = "";
+function launchBossMove() {
+	moveBossWaveThread = setInterval(function() {
+		moveBossWave()
+	}, 10000);
+	moveBossWave();
+}
+
+function moveBossWave() {
+	$("#enemy-boss" + bossNumber).animate({
+		"left" : "+=" + (directionAnimationBoss * 550)
+	}, 4500, function() {
+		$("#enemy-boss" + bossNumber).animate({
+			"left" : "-=" + (directionAnimationBoss * 550)
+		}, 4500, function() {
+			directionAnimationBoss = directionAnimationBoss * -1;
 		});
 	});
 }
+
 
 // ---- handle the move of the bloc enemys
 var shotEnemyThread = "";
@@ -365,22 +503,25 @@ function checkEnemys() {
 		}
 	}
 
-	if (allDead) {
+	if (allDead  && !isBoss) {
+		
 		$("#enemy-wave").css({
 			"display" : "none"
 		});
 		$("#level-number").empty().append(level);
-		level++;
+		$("#level-number-next").empty().append((level)+1);
 		$("#message").fadeIn(500);
 		setTimeout(function() {
 			$("#message").fadeOut(500);
 		}, 3000);
-
-		clearInterval(moveEnemyWaveThread);
+		
+		yEnemyPosition = 40;
+		
+		//clearInterval(moveEnemyWaveThread);
 		setTimeout(function() {
-			yEnemyPosition = 40;
+			
 			createEnemysWave();
-			launchEnemyMove();
+			
 		}, 4000);
 	}
 }
@@ -397,7 +538,9 @@ function launchGame() {
 	$("#lifes").css({
 		"display" : "inline"
 	});
+	level = 0;
 	gameLaunched = true;
+	current_screen = 1;
 	createEnemysWave();
 	launchEnemyMove();
 	launchEnemyShot();
