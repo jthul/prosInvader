@@ -12,6 +12,11 @@
   		Your browser does not support the audio element.
 	</audio> 
 	
+<audio controls style="display:none;" id="music2">
+  	<source src="data/sounds/music2.mp3" type="audio/mp3" >
+  		Your browser does not support the audio element.
+	</audio> 
+	
 	<div id="bg-stars">
 	</div>
 	
