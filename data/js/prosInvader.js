@@ -30,13 +30,13 @@ var directionAnimationBoss = -1;
 // ---- to manage the game
 var score = 0;
 var level = 0;
-var SHIP_SPEED = 1500;
+var SHIP_SPEED = 1200;
 var gameLaunched = false;
 var lifes = 3;
 var gun = 1 // 1 : normal ; 2 : 3-shot ; 3 : rifle
 
 var bossNumber = 1;
-var bossLife = 10;
+var bossLife = 20;
 // ---- to manage the navigation (0: menu, 1:game, 2:scoreboard)
 var current_screen = 0;
 
@@ -52,6 +52,8 @@ var cptLaser = 1;
 var boom, boom2, boom3 = "";
 var cptBoom = 1;
 var gameover = "";
+
+var bossWidth = [257,0,0];
 
 $(document).ready(function() {
 	// Is going to set the right height for the board
@@ -253,8 +255,13 @@ function shot() {
 									}
 								}
 								
-								// Check if it touched the boss
+								var xBoss = parseInt($("#enemy-boss" + bossNumber).css("left").replace("px",""));
 								
+								// Check if it touched the boss
+								if(isBoss && wShot > xBoss && wShot < (xBoss+500) && now > shipYPosition && now < (shipYPosition + bossWidth[bossNumber-1])){
+									bossTouched();
+									$(this).stop().remove();
+								}
 								
 								// delete the bullet if it is out of the screen
 								if (now == -20) {
@@ -265,6 +272,54 @@ function shot() {
 						});
 	}
 }
+
+function bossTouched(){
+	if(isBoss){
+		bossLife--;
+		if(bossLife == 0 && isBoss){
+			isBoss = false;
+		}
+		$("#enemy-boss"+bossNumber).css({
+			"background-image":"url(data/css/boss"+bossNumber+"_touched.png)"
+		});
+		setTimeout(function() {
+			$("#enemy-boss"+bossNumber).css({
+				"background-image":"url(data/css/boss"+bossNumber+".png)"
+			});
+			
+			if(!isBoss){
+				if(cptBoom == 1){
+					boom.play();
+					cptBoom++;
+				}else if(cptBoom == 2){
+					boom2.play();
+					cptBoom++;
+				}else{
+					boom3.play();
+					cptBoom=1;
+				}
+				$("#enemy-boss"+bossNumber).css(
+						{
+							"background-image" : "url('data/css/boom.png')",
+							"background-repeat" : "no-repeat",
+							"background-size" : "80%"
+						})
+				.animate(
+						{
+							opacity : 0
+						},
+						800,function() {
+							checkEnemys();
+				});
+			}
+			
+		}, 150);
+		
+	}
+	
+	
+}
+
 
 // -- ia methods :
 // ---- create a wave of classic enemys
@@ -484,11 +539,155 @@ function shotEnemy() {
 			}
 		}
 	}
+	shotBoss();
+}
+
+
+function shotBoss(){
+	if(isBoss){
+		var result = Math.floor((Math.random() * 4) + 1);
+		if (result < 3) {
+			if(bossNumber == 1){
+				var xBoss = $("#enemy-boss" + bossNumber).css("left").replace("px","");
+				
+				// SHOT 1
+				
+				$('<div></div>')
+				.addClass('bullet-boss')
+				.css({
+					"left" : (parseInt(xBoss) + 125) + "px",
+					"top" : shipYPosition + 262 + "px"
+				})
+				.appendTo($('#board'))
+				.animate(
+						{
+							left : "-=1500",
+							top : "+=1500"
+						},
+						{
+							duration : 2500,
+							easing : 'linear',
+							step : function(now, fx) {
+								
+							}
+						});
+				
+				$('<div></div>')
+				.addClass('bullet-boss')
+				.css({
+					"left" : (parseInt(xBoss) + 125)+ "px",
+					"top" : shipYPosition + 262 + "px"
+				})
+				.appendTo($('#board'))
+				.animate(
+						{
+							top : "+=1500"
+						},
+						{
+							duration : 2500,
+							easing : 'linear',
+							step : function(now, fx) {
+								
+							}
+						});
+				
+				$('<div></div>')
+				.addClass('bullet-boss')
+				.css({
+					"left" :(parseInt(xBoss) + 125) + "px",
+					"top" : shipYPosition + 262 + "px"
+				})
+				.appendTo($('#board'))
+				.animate(
+						{
+							left : "+=1500",
+							top : "+=1500"
+						},
+						{
+							duration : 2500,
+							easing : 'linear',
+							step : function(now, fx) {
+								
+							}
+						});
+				
+			}
+			
+			
+			
+		}else{
+			if(bossNumber == 1){
+				var xBoss = $("#enemy-boss" + bossNumber).css("left").replace("px","");
+				
+				// SHOT 1
+				
+				$('<div></div>')
+				.addClass('bullet-boss')
+				.css({
+					"left" : (parseInt(xBoss) + 365) + "px",
+					"top" : shipYPosition + 262 + "px"
+				})
+				.appendTo($('#board'))
+				.animate(
+						{
+							left : "-=1500",
+							top : "+=1500"
+						},
+						{
+							duration : 2500,
+							easing : 'linear',
+							step : function(now, fx) {
+								
+							}
+						});
+				
+				$('<div></div>')
+				.addClass('bullet-boss')
+				.css({
+					"left" : (parseInt(xBoss) + 365)+ "px",
+					"top" : shipYPosition + 262 + "px"
+				})
+				.appendTo($('#board'))
+				.animate(
+						{
+							top : "+=1500"
+						},
+						{
+							duration : 2500,
+							easing : 'linear',
+							step : function(now, fx) {
+								
+							}
+						});
+				
+				$('<div></div>')
+				.addClass('bullet-boss')
+				.css({
+					"left" :(parseInt(xBoss) + 365) + "px",
+					"top" : shipYPosition + 262 + "px"
+				})
+				.appendTo($('#board'))
+				.animate(
+						{
+							left : "+=1500",
+							top : "+=1500"
+						},
+						{
+							duration : 2500,
+							easing : 'linear',
+							step : function(now, fx) {
+								
+							}
+						});
+			}
+		}
+	}
 }
 
 // ---- is gonna check every enemys of this wave...
 // if they are all dead it means that the level is done
 function checkEnemys() {
+	
 	var allDead = true;
 	for (i = 0; i < 5; i++) {
 		for (j = 0; j < 11; j++) {
