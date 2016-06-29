@@ -8,12 +8,13 @@ html, body{background:black;padding:0px;margin:0px;font-family:prosInvader;}
 #bg-stars{background:url("background.png");background-position:0px;position:absolute;width:100%;height:100%;}
 #bg-planet{background:url("testplanete.png");background-position:0px;position:absolute;width:100%;height:100%;}
 #board{position:relative;width:100%;margin:auto;overflow:hidden;}
-#ship{position:absolute;width:75px;height:90px;background-color:green;bottom:10px;left:930px;background:url("ship_2.png");}
+#ship{position:absolute;width:75px;height:90px;background:url("ship.gif");bottom:10px;left:930px;}
 #enemy-wave{position:absolute;height:600px;left:100px;top:40px;display:none;z-index:2;}
 #score{position:absolute;right:10px;top:5px;font-size:21px;color:white;z-index:10;display:none;}
-#gameOver{text-shadow: 5px 5px #FF0000;position:absolute;width:1920px;margin-top:180px;text-align:center;font-size:85px;color:yellow;line-height: 155px;display:none;z-index:6;}
+#gameOver{text-shadow: 5px 5px #FF0000;position:absolute;width:1920px;margin-top:110px;text-align:center;font-size:85px;color:yellow;line-height: 155px;display:none;z-index:6;}
 #message{text-shadow: 5px 5px #FF0000;position:absolute;width:1920px;margin-top:80px;text-align:center;font-size:85px;color:yellow;line-height: 155px;display:none;}
 #messageBoss{text-shadow: 5px 5px #FF0000;position:absolute;width:1920px;margin-top:80px;text-align:center;font-size:85px;color:yellow;line-height: 155px;display:none;}
+#Saved{text-shadow: 5px 5px #FF0000;position:absolute;width:1920px;top:150px;text-align:center;font-size:85px;color:yellow;line-height: 155px;z-index:60; background:#212121;opacity:1.0;}
 
 #level-number{color:red;font-size:100px}
 #lifes{position:absolute;width:210px;height:45px;background:url("ship_life.png");right:0px;top:35px; display:none;}
@@ -31,6 +32,14 @@ html, body{background:black;padding:0px;margin:0px;font-family:prosInvader;}
 #bonusPoint{position:absolute;width:172px;height:24px;display:none;margin-top:-75px;margin-left:-50px;background-image:url('bonus.png');}
 #malusPoint{position:absolute;width:200px;height:24px;display:none;margin-top:-75px;margin-left:-70px;background-image:url('malus.png');}
 
+#player{background:transparent;border:0px;border-bottom: 1px solid red; width:400px;font-family:prosInvader;font-size:25px;color:yellow;outline: none}
+#player:focus{border:0px;border-bottom: 1px solid red;outline: none}
+#submit{display:none;}
+#eviterEnter{width:0px;display:none;}
+
+#scoreboard{position:relative;width:1000px;margin:auto;height:50px;z-index:56;}
+
+.title{color:yellow;font-size:65px;}
 ul{list-style:none;}
 li{margin-top:25px;}
 
@@ -50,3 +59,9 @@ li{margin-top:25px;}
 
 #calque{width:100%;height:100%;background:gray;opacity:0.5;z-index:5;display:none;}
 #hurt{width:100%;height:100%;background:red;opacity:0.5;z-index:5;display:none;position:absolute;top:0px;}
+
+#listScore{margin-top:50px;}
+.playername{font-size:32px;float:left;color:red;margin-right:150px;}
+.playerScore{position:absolute;margin-left:500px;color:yellow;font-size:32px;}
+.cb{clear:both;}
+.lignescore{margin-top:7px;}

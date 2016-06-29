@@ -56,6 +56,9 @@ var cptLaser = 1;
 var boom, boom2, boom3 = "";
 var cptBoom = 1;
 var gameover = "";
+var gameReady = false;
+
+var music1, music2, music3, music4;
 
 var bossWidth = [ 257, 320, 300 ];
 
@@ -73,10 +76,12 @@ $(document).ready(function() {
 	// released
 	$(document).keydown(function(e) {
 		// No F5 allowed...
-		if ((e.which || e.keyCode) == 116 || (e.which || e.keyCode) == 82)
+		if ((e.which || e.keyCode) == 116 )
 			e.preventDefault();
-		else 
+		else if(current_screen == 1){
 			listOfKeysPressed[e.keyCode] = true;
+		}
+			
 	});
 
 	// handle keyboard events => key Up is when key is released
@@ -93,6 +98,7 @@ $(document).ready(function() {
 		else if (e.keyCode == 13)
 			validateOnMenu();
 		else
+			
 			listOfKeysPressed[e.keyCode] = false;
 	});
 
@@ -127,35 +133,50 @@ $(document).ready(function() {
 		}
 	}, 2500);
 	
-	setInterval(function() {
-		if (shipImgCpt == 4) {
-			shipImgCpt = 0;
-		}
-		shipImgCpt++;
-		$("#ship").css({
-			"background-image" : "url('data/css/ship_" + shipImgCpt + ".png')"
-		}, function() {
-
+	
+	$("#player").on("keyup", function(e) {
+		  if(e.which == 13)
+		    if( typeof($("#player").val()) != "undefined" && $("#player").val() != ""){
+		    	console.log($("#player").val())
+		    	$("#submitplayer").submit();
+		    }
 		});
-	}, 100);
+	
+	setTimeout(function(){gameReady = true;$("#Saved").fadeOut(2000);}, 2000)
 
 	launchBackgroundAnimation();
 	launchBossMove();
 	majUIMenu();
 	laser = document.createElement('audio');
 	laser.setAttribute('src', 'data/sounds/laser.wav');
+	laser.volume = 0.2;
 	laser2 = document.createElement('audio');
 	laser2.setAttribute('src', 'data/sounds/laser.wav');
+	laser2.volume = 0.2;
 	laser3 = document.createElement('audio');
 	laser3.setAttribute('src', 'data/sounds/laser.wav');
+	laser3.volume = 0.2;
 	boom = document.createElement('audio');
 	boom.setAttribute('src', 'data/sounds/grenade.wav');
+	boom.volume = 0.3;
 	boom2 = document.createElement('audio');
 	boom2.setAttribute('src', 'data/sounds/grenade.wav');
+	boom2.volume = 0.2;
 	boom3 = document.createElement('audio');
 	boom3.setAttribute('src', 'data/sounds/grenade.wav');
+	boom3.volume = 0.4;
 	gameover = document.createElement('audio');
 	gameover.setAttribute('src', 'data/sounds/gameover.mp3');
+	
+	music1 = document.getElementById('music1');
+	music1.volume= 0.6;
+	music1.onended = function() {
+		music1.play();
+	};
+	
+	music1.play();
+     
+	
 });
 
 // -- ship methods :
@@ -193,7 +214,7 @@ function bonus(bonusType) {
 					top : 1500
 				},
 				{
-					duration : 2000,
+					duration : 2500,
 					easing : 'linear',
 					step : function(now, fx) {
 						var yBonus = parseInt($(this).css(
@@ -227,7 +248,7 @@ function bonus(bonusType) {
 					top : 1500
 				},
 				{
-					duration : 2000,
+					duration : 2500,
 					easing : 'linear',
 					step : function(now, fx) {
 						var yBonus = parseInt($(this).css(
@@ -261,7 +282,7 @@ function bonus(bonusType) {
 					top : 1500
 				},
 				{
-					duration : 2000,
+					duration : 2500,
 					easing : 'linear',
 					step : function(now, fx) {
 						var yBonus = parseInt($(this).css(
@@ -295,7 +316,7 @@ function bonus(bonusType) {
 					top : 1500
 				},
 				{
-					duration : 2000,
+					duration : 2500,
 					easing : 'linear',
 					step : function(now, fx) {
 						var yBonus = parseInt($(this).css(
@@ -325,23 +346,28 @@ function bonus(bonusType) {
 
 
 function shieldUp(){
+	score+=25;
+	manageScore();
 	shield = true;
 	$("#shield").fadeIn(300);
 	setTimeout(function(){
 		shield = false;
 		$("#shield").css({"display":"none"});
-	}, 2800);
+	}, 2100);
 }
 
 function gunUpdate(){
+	score+=25;
+	manageScore();
 	gun = 2;
 	setTimeout(function(){
 		gun = 1;
-	}, 3000);
+	}, 2100);
 }
 
 function bonusPoint(){
 	score+=200;
+	manageScore();
 	$("#bonusPoint").css({"display":"inline"});
 	setTimeout(function(){
 		shield = false;
@@ -352,6 +378,7 @@ function bonusPoint(){
 
 function malusPoint(){
 	score-=200;
+	manageScore();
 	$("#malusPoint").css({"display":"inline"});
 	setTimeout(function(){
 		shield = false;
@@ -492,11 +519,11 @@ function shot() {
 				.appendTo($('#board'))
 				.animate(
 						{
-							top : "-=1500",
+							top : "-=2500",
 							left : "+=1500"
 						},
 						{
-							duration : 1000,
+							duration : 1500,
 							easing : 'linear',
 							step : function(now, fx) {
 								var nowY = parseInt($(this).css(
@@ -564,17 +591,14 @@ function shot() {
 								var xBoss = parseInt($(
 										"#enemy-boss" + bossNumber).css("left")
 										.replace("px", ""));
-								/*
-								// Check if it touched the boss
 								if (isBoss
-										&& wShot > xBoss
-										&& wShot < (xBoss + 500)
-										&& now > shipYPosition
-										&& now < (shipYPosition + bossWidth[bossNumber - 1])) {
+										&& nowX > xBoss
+										&& nowX < (xBoss + 500)
+										&& nowY > shipYPosition
+										&& nowY < (shipYPosition + bossWidth[bossNumber - 1])) {
 									bossTouched();
 									$(this).stop().remove();
 								}
-								*/
 								// delete the bullet if it is out of the screen
 								if (nowY <= -20) {
 									$(this).remove();
@@ -592,11 +616,11 @@ function shot() {
 				.appendTo($('#board'))
 				.animate(
 						{
-							top : "-=1500",
+							top : "-=2500",
 							left : "-=1500"
 						},
 						{
-							duration : 1000,
+							duration : 1500,
 							easing : 'linear',
 							step : function(now, fx) {
 								var nowY = parseInt($(this).css(
@@ -664,17 +688,17 @@ function shot() {
 								var xBoss = parseInt($(
 										"#enemy-boss" + bossNumber).css("left")
 										.replace("px", ""));
-								/*
+								
 								// Check if it touched the boss
 								if (isBoss
-										&& wShot > xBoss
-										&& wShot < (xBoss + 500)
-										&& now > shipYPosition
-										&& now < (shipYPosition + bossWidth[bossNumber - 1])) {
+										&& nowX > xBoss
+										&& nowX < (xBoss + 500)
+										&& nowY > shipYPosition
+										&& nowY < (shipYPosition + bossWidth[bossNumber - 1])) {
 									bossTouched();
 									$(this).stop().remove();
 								}
-								*/
+								
 								// delete the bullet if it is out of the screen
 								if (nowY <= -20) {
 									$(this).remove();
@@ -689,6 +713,8 @@ function shot() {
 
 function bossTouched() {
 	if (isBoss) {
+		score+=10,
+		manageScore();
 		bossLife--;
 		if (bossLife == 0 && isBoss) {
 			isBoss = false;
@@ -1086,21 +1112,21 @@ function shotBoss() {
 		
 		if(result == 7 || result == 8){
 		
-		// Dans tous les cas si on est sur le boss 2 :
-		if (bossNumber == 2) {
-			var xBoss = $("#enemy-boss" + bossNumber).css("left").replace("px",
-					"");
-			launchBossShot(parseInt(xBoss) + 250, shipYPosition + 337, "-");
-			launchBossShot(parseInt(xBoss) + 250, shipYPosition + 387, "0");
-			launchBossShot(parseInt(xBoss) + 250, shipYPosition + 387, "+");
-		} else if (bossNumber == 3) {
-			var xBoss = $("#enemy-boss" + bossNumber).css("left").replace("px",
-					"");
-			launchBossShot(parseInt(xBoss) + 250, shipYPosition + 337, "-");
-			launchBossShot(parseInt(xBoss) + 250, shipYPosition + 387, "0");
-			launchBossShot(parseInt(xBoss) + 250, shipYPosition + 387, "+");
+			// Dans tous les cas si on est sur le boss 2 :
+			if (bossNumber == 2) {
+				var xBoss = $("#enemy-boss" + bossNumber).css("left").replace("px",
+						"");
+				launchBossShot(parseInt(xBoss) + 250, shipYPosition + 337, "-");
+				launchBossShot(parseInt(xBoss) + 250, shipYPosition + 387, "0");
+				launchBossShot(parseInt(xBoss) + 250, shipYPosition + 387, "+");
+			} 
 		}
-		
+		if (bossNumber == 3) {
+			var xBoss = $("#enemy-boss" + bossNumber).css("left").replace("px",
+					"");
+			launchBossShot(parseInt(xBoss) + 250, shipYPosition + 337, "-");
+			launchBossShot(parseInt(xBoss) + 250, shipYPosition + 387, "0");
+			launchBossShot(parseInt(xBoss) + 250, shipYPosition + 387, "+");
 		}
 	}
 }
@@ -1200,7 +1226,7 @@ function checkEnemys() {
 		$("#message").fadeIn(500);
 		setTimeout(function() {
 			$("#message").fadeOut(500);
-		}, 2000);
+		}, 4000);
 
 		yEnemyPosition = 40 + (level * 10);
 
@@ -1209,7 +1235,7 @@ function checkEnemys() {
 			if (isCreatingNewWave) {
 				createEnemysWave();
 			}
-		}, 3100);
+		}, 4500);
 
 	}
 
@@ -1252,12 +1278,14 @@ function launchGame() {
 function gameOver() {
 	gameover.play();
 	gameLaunched = false;
+	current_screen = 2;
 	clearInterval(checkWaveThread);
 	clearInterval(moveEnemyWaveThread);
 	clearInterval(shotEnemyThread);
 	$("#enemy-wave").fadeOut(1000);
 	$("#gameOver").fadeIn(1000);
-	$("#calque").fadeIn(1000)
+	$("#calque").fadeIn(1000);
+	$("#player").focus();
 
 }
 
@@ -1321,7 +1349,7 @@ function manageScore() {
 	}
 
 	$("#score-player").empty().append(scoreTxt);
-
+	$("#scoreInput").val(score);
 }
 // ---- will launch the background animation
 function launchBackgroundAnimation() {
@@ -1350,23 +1378,23 @@ function launchBackgroundAnimation() {
 }
 
 function validateOnMenu() {
-	if (menu == 1 && current_screen == 0) {
+	if (menu == 1 && current_screen == 0 && gameReady) {
 		launchGame();
 	}
 }
 
 function goUpMenu() {
-	if (menu > 1) {
+	/*if (menu > 1) {
 		menu--;
 	}
-	majUIMenu();
+	majUIMenu();*/
 }
 
 function goDownMenu() {
-	if (menu < 2) {
+	/*if (menu < 2) {
 		menu++;
 	}
-	majUIMenu();
+	majUIMenu();*/
 }
 
 function majUIMenu() {
