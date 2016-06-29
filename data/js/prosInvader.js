@@ -10,7 +10,7 @@ var listOfKeysPressed = [];
 // ---- Is going to be used to manage the background animation (stars moving in
 // the background)
 var backgroundPosition = 0;
-var backgroundPositionplanet= 0;
+var backgroundPositionplanet = 0;
 // ---- Is going to manage the ship position on the board
 var shipYPosition = 20;
 var shipXPosition = 650;
@@ -34,8 +34,10 @@ var score = 0;
 var level = 0;
 var SHIP_SPEED = 800;
 var gameLaunched = false;
-var lifes = 3;
-var gun = 1 // 1 : normal ; 2 : 3-shot ; 3 : rifle
+var lifes = 5;
+var gun = 1; // 1 : normal ; 2 : 3-shot
+var shield = false;
+var canShot = true;
 
 var bossNumber = 1;
 var bossLife = 20;
@@ -55,7 +57,7 @@ var boom, boom2, boom3 = "";
 var cptBoom = 1;
 var gameover = "";
 
-var bossWidth = [257,320,300];
+var bossWidth = [ 257, 320, 300 ];
 
 $(document).ready(function() {
 	// Is going to set the right height for the board
@@ -73,7 +75,7 @@ $(document).ready(function() {
 		// No F5 allowed...
 		if ((e.which || e.keyCode) == 116 || (e.which || e.keyCode) == 82)
 			e.preventDefault();
-		else
+		else 
 			listOfKeysPressed[e.keyCode] = true;
 	});
 
@@ -105,7 +107,7 @@ $(document).ready(function() {
 		$("#boss").animate({
 			"top" : shipYPosition + "px"
 		}, 400, function() {
-			
+
 		});
 		$("#ship").animate({
 			"bottom" : shipYPosition + "px"
@@ -116,8 +118,14 @@ $(document).ready(function() {
 				shipYPosition = 10;
 			}
 		});
-		
+
 	}, 400);
+
+	setInterval(function() {
+		if (gameLaunched) {
+			bonus(5);
+		}
+	}, 2500);
 	
 	setInterval(function() {
 		if (shipImgCpt == 4) {
@@ -127,27 +135,27 @@ $(document).ready(function() {
 		$("#ship").css({
 			"background-image" : "url('data/css/ship_" + shipImgCpt + ".png')"
 		}, function() {
-			
+
 		});
 	}, 100);
-	
+
 	launchBackgroundAnimation();
 	launchBossMove();
 	majUIMenu();
-	 laser = document.createElement('audio');
-     laser.setAttribute('src', 'data/sounds/laser.wav');
-     laser2 = document.createElement('audio');
-     laser2.setAttribute('src', 'data/sounds/laser.wav');
-     laser3 = document.createElement('audio');
-     laser3.setAttribute('src', 'data/sounds/laser.wav');
-     boom = document.createElement('audio');
-     boom.setAttribute('src', 'data/sounds/grenade.wav');
-     boom2 = document.createElement('audio');
-     boom2.setAttribute('src', 'data/sounds/grenade.wav');
-     boom3 = document.createElement('audio');
-     boom3.setAttribute('src', 'data/sounds/grenade.wav');
-     gameover = document.createElement('audio');
-     gameover.setAttribute('src', 'data/sounds/gameover.mp3');
+	laser = document.createElement('audio');
+	laser.setAttribute('src', 'data/sounds/laser.wav');
+	laser2 = document.createElement('audio');
+	laser2.setAttribute('src', 'data/sounds/laser.wav');
+	laser3 = document.createElement('audio');
+	laser3.setAttribute('src', 'data/sounds/laser.wav');
+	boom = document.createElement('audio');
+	boom.setAttribute('src', 'data/sounds/grenade.wav');
+	boom2 = document.createElement('audio');
+	boom2.setAttribute('src', 'data/sounds/grenade.wav');
+	boom3 = document.createElement('audio');
+	boom3.setAttribute('src', 'data/sounds/grenade.wav');
+	gameover = document.createElement('audio');
+	gameover.setAttribute('src', 'data/sounds/gameover.mp3');
 });
 
 // -- ship methods :
@@ -168,20 +176,214 @@ function goRight() {
 	}
 }
 
+function bonus(bonusType) {
+	
+	switch (bonusType) {
+	case 1:
+		var result = Math.floor((Math.random() * 1500) + 1);
+		$('<div></div>')
+		.addClass('ag2rbonus')
+		.css({
+			left : result + 100 + "px",
+			top : -100 + "px"
+		})
+		.appendTo($('#bonus'))
+		.animate(
+				{
+					top : 1500
+				},
+				{
+					duration : 2000,
+					easing : 'linear',
+					step : function(now, fx) {
+						var yBonus = parseInt($(this).css(
+						"bottom").replace("px", ""));
+						var xBonus = parseInt($(this).css(
+								"left").replace("px", ""));
+						var xShip = parseInt($("#ship")
+								.css("left").replace("px",
+										""));
+						if (yBonus <= 75 && yBonus > 10) {
+							if ((xBonus+100) >= xShip
+									&& (xBonus) <= (xShip + 75)) {
+								$(this).remove();
+								shieldUp();
+							}
+						}
+					}
+				});
+		break;
+	case 2:
+		var result = Math.floor((Math.random() * 1500) + 1);
+		$('<div></div>')
+		.addClass('manitoubonus')
+		.css({
+			left : result + 100 + "px",
+			top : -100 + "px"
+		})
+		.appendTo($('#bonus'))
+		.animate(
+				{
+					top : 1500
+				},
+				{
+					duration : 2000,
+					easing : 'linear',
+					step : function(now, fx) {
+						var yBonus = parseInt($(this).css(
+						"bottom").replace("px", ""));
+						var xBonus = parseInt($(this).css(
+								"left").replace("px", ""));
+						var xShip = parseInt($("#ship")
+								.css("left").replace("px",
+										""));
+						if (yBonus <= 75 && yBonus > 10) {
+							if ((xBonus+100) >= xShip
+									&& (xBonus) <= (xShip + 75)) {
+								$(this).remove();
+								gunUpdate();
+							}
+						}
+					}
+				});
+		break;
+	case 3:
+		var result = Math.floor((Math.random() * 1500) + 1);
+		$('<div></div>')
+		.addClass('lmbonus')
+		.css({
+			left : result + 100 + "px",
+			top : -100 + "px"
+		})
+		.appendTo($('#bonus'))
+		.animate(
+				{
+					top : 1500
+				},
+				{
+					duration : 2000,
+					easing : 'linear',
+					step : function(now, fx) {
+						var yBonus = parseInt($(this).css(
+						"bottom").replace("px", ""));
+						var xBonus = parseInt($(this).css(
+								"left").replace("px", ""));
+						var xShip = parseInt($("#ship")
+								.css("left").replace("px",
+										""));
+						if (yBonus <= 75 && yBonus > 10) {
+							if ((xBonus+100) >= xShip
+									&& (xBonus) <= (xShip + 75)) {
+								$(this).remove();
+								bonusPoint();
+							}
+						}
+					}
+				});
+		break;
+	case 4 :
+		var result = Math.floor((Math.random() * 1500) + 1);
+		$('<div></div>')
+		.addClass('sagemalus')
+		.css({
+			left : result + 100 + "px",
+			top : -100 + "px"
+		})
+		.appendTo($('#bonus'))
+		.animate(
+				{
+					top : 1500
+				},
+				{
+					duration : 2000,
+					easing : 'linear',
+					step : function(now, fx) {
+						var yBonus = parseInt($(this).css(
+						"bottom").replace("px", ""));
+						var xBonus = parseInt($(this).css(
+								"left").replace("px", ""));
+						var xShip = parseInt($("#ship")
+								.css("left").replace("px",
+										""));
+						if (yBonus <= 75 && yBonus > 10) {
+							if ((xBonus+100) >= xShip
+									&& (xBonus) <= (xShip + 75)) {
+								$(this).remove();
+								malusPoint();
+							}
+						}
+					}
+				});
+		break;
+	case 5:
+		var result = Math.floor((Math.random() * 4) + 1);
+		bonus(result);
+		break
+	}
+
+}
+
+
+function shieldUp(){
+	shield = true;
+	$("#shield").fadeIn(300);
+	setTimeout(function(){
+		shield = false;
+		$("#shield").css({"display":"none"});
+	}, 2800);
+}
+
+function gunUpdate(){
+	gun = 2;
+	setTimeout(function(){
+		gun = 1;
+	}, 3000);
+}
+
+function bonusPoint(){
+	score+=200;
+	$("#bonusPoint").css({"display":"inline"});
+	setTimeout(function(){
+		shield = false;
+		$("#bonusPoint").css({"display":"none"});
+	}, 500);
+	
+}
+
+function malusPoint(){
+	score-=200;
+	$("#malusPoint").css({"display":"inline"});
+	setTimeout(function(){
+		shield = false;
+		$("#malusPoint").css({"display":"none"});
+	}, 500);
+}
+
+function shieldUp(){
+	shield = true;
+	$("#shield").fadeIn(300);
+	setTimeout(function(){
+		shield = false;
+		$("#shield").css({"display":"none"});
+	}, 2800);
+}
+
+
 // ---- shot ONE bullet
 function shot() {
-	if (gameLaunched) {
-		if(cptLaser ==1){
+	if (gameLaunched ) {
+		
+		if (cptLaser == 1) {
 			laser.play();
 			cptLaser++;
-		}else if(cptLaser ==2){
+		} else if (cptLaser == 2) {
 			laser2.play();
 			cptLaser++;
-		}else{
+		} else {
 			laser3.play();
-			cptLaser=1;
+			cptLaser = 1;
 		}
-		
+
 		var wShot = $("#ship").css("left").replace("px", "");
 		$('<div></div>')
 				.addClass('bullet')
@@ -212,17 +414,17 @@ function shot() {
 													// now + "<>" + (90 +
 													// (i*100)) + ":" +
 													// (i*100));
-													if(cptBoom == 1){
+													if (cptBoom == 1) {
 														boom.play();
 														cptBoom++;
-													}else if(cptBoom == 2){
+													} else if (cptBoom == 2) {
 														boom2.play();
 														cptBoom++;
-													}else{
+													} else {
 														boom3.play();
-														cptBoom=1;
+														cptBoom = 1;
 													}
-													
+
 													enemysShip[idenemy] = false;
 													score += 20;
 													manageScore();
@@ -257,238 +459,446 @@ function shot() {
 										}
 									}
 								}
-								
-								var xBoss = parseInt($("#enemy-boss" + bossNumber).css("left").replace("px",""));
-								
+
+								var xBoss = parseInt($(
+										"#enemy-boss" + bossNumber).css("left")
+										.replace("px", ""));
+
 								// Check if it touched the boss
-								if(isBoss && wShot > xBoss && wShot < (xBoss+500) && now > shipYPosition && now < (shipYPosition + bossWidth[bossNumber-1])){
+								if (isBoss
+										&& wShot > xBoss
+										&& wShot < (xBoss + 500)
+										&& now > shipYPosition
+										&& now < (shipYPosition + bossWidth[bossNumber - 1])) {
 									bossTouched();
 									$(this).stop().remove();
 								}
-								
+
 								// delete the bullet if it is out of the screen
 								if (now == -20) {
 									$(this).remove();
 								}
 							}
 						}, function() {
-						});
-	}
-}
-
-function bossTouched(){
-	if(isBoss){
-		bossLife--;
-		if(bossLife == 0 && isBoss){
-			isBoss = false;
-		}
-		$("#enemy-boss"+bossNumber).css({
-			"background-image":"url(data/css/boss"+bossNumber+"_touched.png)"
-		});
-		setTimeout(function() {
-			$("#enemy-boss"+bossNumber).css({
-				"background-image":"url(data/css/boss"+bossNumber+".png)"
-			});
-			
-			if(!isBoss){
-				if(cptBoom == 1){
-					boom.play();
-					cptBoom++;
-				}else if(cptBoom == 2){
-					boom2.play();
-					cptBoom++;
-				}else{
-					boom3.play();
-					cptBoom=1;
-				}
-				$("#enemy-boss"+bossNumber).css(
-						{
-							"background-image" : "url('data/css/boom.png')",
-							"background-repeat" : "no-repeat",
-							"background-size" : "80%"
-						})
+					});
+		
+			if( gun == 2 ){
+				$('<div></div>')
+				.addClass('bullet')
+				.css({
+					left : (parseInt(wShot) + 27) + "px",
+					bottom : 98
+				})
+				.appendTo($('#board'))
 				.animate(
 						{
-							opacity : 0
+							top : "-=1500",
+							left : "+=1500"
 						},
-						800,function() {
-							checkEnemys();
-				});
+						{
+							duration : 1000,
+							easing : 'linear',
+							step : function(now, fx) {
+								var nowY = parseInt($(this).css(
+								"top").replace("px", ""));
+								var nowX = parseInt($(this).css(
+										"left").replace("px", ""));
+								for (i = 0; i < 5; i++) {
+									for (j = 0; j < 11; j++) {
+										var idenemy = "enemy-" + i + "-" + j;
+									
+										
+										if (enemysShip[idenemy] == true) {
+											if ((nowX + 27) >= (190 + (j * 145))
+													&& (nowX + 27) <= (190 + (j + 1) * 145) - 55) {
+												if ((nowY) >= ((i * 100) + yEnemyPosition)
+														&& (nowY) <= ((i + 1) * 100)
+																+ yEnemyPosition) {
+													
+													if (cptBoom == 1) {
+														boom.play();
+														cptBoom++;
+													} else if (cptBoom == 2) {
+														boom2.play();
+														cptBoom++;
+													} else {
+														boom3.play();
+														cptBoom = 1;
+													}
+
+													enemysShip[idenemy] = false;
+													score += 20;
+													manageScore();
+													//
+													$("#" + idenemy)
+															.css(
+																	{
+																		"background-image" : "url('data/css/boom.png')",
+																		"background-repeat" : "no-repeat",
+																		"background-size" : "100%"
+																	})
+															.animate(
+																	{
+																		height : 0,
+																		width : 0,
+																		"background-size" : "25%",
+																		left : "+=45",
+																		top : "+=45",
+																	},
+																	500,
+																	function() {
+																		$(this)
+																				.remove();
+																		checkEnemys();
+																	});
+
+													$(this).stop().remove();
+												}
+											} else {
+
+											}
+										}
+									}
+								}
+
+								var xBoss = parseInt($(
+										"#enemy-boss" + bossNumber).css("left")
+										.replace("px", ""));
+								/*
+								// Check if it touched the boss
+								if (isBoss
+										&& wShot > xBoss
+										&& wShot < (xBoss + 500)
+										&& now > shipYPosition
+										&& now < (shipYPosition + bossWidth[bossNumber - 1])) {
+									bossTouched();
+									$(this).stop().remove();
+								}
+								*/
+								// delete the bullet if it is out of the screen
+								if (nowY <= -20) {
+									$(this).remove();
+								}
+							}
+						}, function() {
+					});
+				
+				$('<div></div>')
+				.addClass('bullet')
+				.css({
+					left : (parseInt(wShot) + 27) + "px",
+					bottom : 98
+				})
+				.appendTo($('#board'))
+				.animate(
+						{
+							top : "-=1500",
+							left : "-=1500"
+						},
+						{
+							duration : 1000,
+							easing : 'linear',
+							step : function(now, fx) {
+								var nowY = parseInt($(this).css(
+								"top").replace("px", ""));
+								var nowX = parseInt($(this).css(
+										"left").replace("px", ""));
+								for (i = 0; i < 5; i++) {
+									for (j = 0; j < 11; j++) {
+										var idenemy = "enemy-" + i + "-" + j;
+									
+										
+										if (enemysShip[idenemy] == true) {
+											if ((nowX + 27) >= (190 + (j * 145))
+													&& (nowX + 27) <= (190 + (j + 1) * 145) - 55) {
+												if ((nowY) >= ((i * 100) + yEnemyPosition)
+														&& (nowY) <= ((i + 1) * 100)
+																+ yEnemyPosition) {
+													
+													if (cptBoom == 1) {
+														boom.play();
+														cptBoom++;
+													} else if (cptBoom == 2) {
+														boom2.play();
+														cptBoom++;
+													} else {
+														boom3.play();
+														cptBoom = 1;
+													}
+
+													enemysShip[idenemy] = false;
+													score += 20;
+													manageScore();
+													//
+													$("#" + idenemy)
+															.css(
+																	{
+																		"background-image" : "url('data/css/boom.png')",
+																		"background-repeat" : "no-repeat",
+																		"background-size" : "100%"
+																	})
+															.animate(
+																	{
+																		height : 0,
+																		width : 0,
+																		"background-size" : "25%",
+																		left : "+=45",
+																		top : "+=45",
+																	},
+																	500,
+																	function() {
+																		$(this)
+																				.remove();
+																		checkEnemys();
+																	});
+
+													$(this).stop().remove();
+												}
+											} else {
+
+											}
+										}
+									}
+								}
+
+								var xBoss = parseInt($(
+										"#enemy-boss" + bossNumber).css("left")
+										.replace("px", ""));
+								/*
+								// Check if it touched the boss
+								if (isBoss
+										&& wShot > xBoss
+										&& wShot < (xBoss + 500)
+										&& now > shipYPosition
+										&& now < (shipYPosition + bossWidth[bossNumber - 1])) {
+									bossTouched();
+									$(this).stop().remove();
+								}
+								*/
+								// delete the bullet if it is out of the screen
+								if (nowY <= -20) {
+									$(this).remove();
+								}
+							}
+						}, function() {
+					});
 			}
 			
-		}, 150);
-		
 	}
-	
-	
 }
 
+function bossTouched() {
+	if (isBoss) {
+		bossLife--;
+		if (bossLife == 0 && isBoss) {
+			isBoss = false;
+		}
+		$("#enemy-boss" + bossNumber).css(
+				{
+					"background-image" : "url(data/css/boss" + bossNumber
+							+ "_touched.png)"
+				});
+		setTimeout(function() {
+			$("#enemy-boss" + bossNumber).css({
+				"background-image" : "url(data/css/boss" + bossNumber + ".png)"
+			});
+
+			if (!isBoss) {
+				if (cptBoom == 1) {
+					boom.play();
+					cptBoom++;
+				} else if (cptBoom == 2) {
+					boom2.play();
+					cptBoom++;
+				} else {
+					boom3.play();
+					cptBoom = 1;
+				}
+				$("#enemy-boss" + bossNumber).css({
+					"background-image" : "url('data/css/boom.png')",
+					"background-repeat" : "no-repeat",
+					"background-size" : "80%"
+				}).animate({
+					opacity : 0
+				}, 800, function() {
+					checkEnemys();
+				});
+			}
+
+		}, 150);
+
+	}
+
+}
 
 // -- ia methods :
 // ---- create a wave of classic enemys
 function createEnemysWave() {
-		enemysShip = [];
-		isCreatingNewWave = true;
-		if(secondWaveInLevel || level == 0){
-			level++;
-			secondWaveInLevel = false;
-		}
-		
-		$("#enemy-wave").empty();
-		$("#enemy-wave").css({
-			"top" : ((40 + (level*10))+"px")
-		})
-		for (i = 0; i < 5; i++) {
-			for (j = 0; j < 11; j++) {
-				
-				/*
-				 * LEVEL 1 
-				 */
-				if(level == 1 || level == 8 || level==14 || level ==13){
-					if(i < 3 && j > 2 && j < 9 ){
-						createEnemy(i,j);
-					}else{
-						var idenemy = "enemy-" + i + "-" + j;
-						enemysShip[idenemy] = false;
-					}
-				}
-				/*
-				 * LEVEL 2 
-				 */
-				else if(level == 2){
-					if(i <4 && j > 2 && j < 9 ){
-						createEnemy(i,j);
-						
-					}else{
-						var idenemy = "enemy-" + i + "-" + j;
-						enemysShip[idenemy] = false;
-					}
-				}
-				/*
-				 * BOSS 1
-				 */
-				else if(level == 3){
-					if(i > 2 && j > 1 && j < 10 ){
-						createEnemy(i,j);
-					}else{
-						var idenemy = "enemy-" + i + "-" + j;
-						enemysShip[idenemy] = false;
-					}
-				}
-				/*
-				 * LEVEL 4
-				 */
-				else if(level == 4){
-					if(j > 1 && j < 10 ){
-						createEnemy(i,j);
-					}else{
-						var idenemy = "enemy-" + i + "-" + j;
-						enemysShip[idenemy] = false;
-					}
-				}
-				/*
-				 * LEVEL 5 
-				 */
-				else if(level == 5){
-					if(i<4){
-						createEnemy(i,j);
-					}else{
-						var idenemy = "enemy-" + i + "-" + j;
-						enemysShip[idenemy] = false;
-					}
-				}
-				/*
-				 * BOSS 2
-				 */
-				else if(level == 6){
-					if(i > 1 ){
-						createEnemy(i,j);
-					}else{
-						var idenemy = "enemy-" + i + "-" + j;
-						enemysShip[idenemy] = false;
-					}
-				}
-				else{
-					
-					createEnemy(i,j);
+	enemysShip = [];
+	isCreatingNewWave = true;
+	if (secondWaveInLevel || level == 0) {
+		level++;
+		secondWaveInLevel = false;
+	}
+
+	$("#enemy-wave").empty();
+	$("#enemy-wave").css({
+		"top" : ((40 + (level * 10)) + "px")
+	})
+	for (i = 0; i < 5; i++) {
+		for (j = 0; j < 11; j++) {
+
+			/*
+			 * LEVEL 1
+			 */
+			if (level == 1 || level == 8 || level == 14 || level == 13) {
+				if (i < 3 && j > 2 && j < 9) {
+					createEnemy(i, j);
+				} else {
+					var idenemy = "enemy-" + i + "-" + j;
+					enemysShip[idenemy] = false;
 				}
 			}
+			/*
+			 * LEVEL 2
+			 */
+			else if (level == 2) {
+				if (i < 4 && j > 2 && j < 9) {
+					createEnemy(i, j);
+
+				} else {
+					var idenemy = "enemy-" + i + "-" + j;
+					enemysShip[idenemy] = false;
+				}
+			}
+			/*
+			 * BOSS 1
+			 */
+			else if (level == 3) {
+				if (i > 2 && j > 1 && j < 10) {
+					createEnemy(i, j);
+				} else {
+					var idenemy = "enemy-" + i + "-" + j;
+					enemysShip[idenemy] = false;
+				}
+			}
+			/*
+			 * LEVEL 4
+			 */
+			else if (level == 4) {
+				if (j > 1 && j < 10) {
+					createEnemy(i, j);
+				} else {
+					var idenemy = "enemy-" + i + "-" + j;
+					enemysShip[idenemy] = false;
+				}
+			}
+			/*
+			 * LEVEL 5
+			 */
+			else if (level == 5) {
+				if (i < 4) {
+					createEnemy(i, j);
+				} else {
+					var idenemy = "enemy-" + i + "-" + j;
+					enemysShip[idenemy] = false;
+				}
+			}
+			/*
+			 * BOSS 2
+			 */
+			else if (level == 6) {
+				if (i > 1 && i<5) {
+					createEnemy(i, j);
+				} else {
+					var idenemy = "enemy-" + i + "-" + j;
+					enemysShip[idenemy] = false;
+				}
+			} else {
+
+				createEnemy(i, j);
+			}
 		}
-		yEnemyPosition = 40 + (level*10);
-		directionAnimationBoss = -1;
-		// Ajout du boss s'il existe
-		if((level == 3 || level == 12 || level == 21) && !secondWaveInLevelCalled){
-			bossNumber = 1;
-			bossLife = 20;
-			secondWaveInLevel = true;
-			$("#enemy-boss1").css({
-				"background-image" : "url('data/css/boss1.png')",
-				"margin-top":"-150px"
-			}).fadeIn(1500, function(){
-				isBoss = true;
-			}).animate({
-				"margin-top" :"0px"
-			}, 1500, function(){
-				
-			});
-		}else if((level == 6 || level == 15 || level == 24  ) && !secondWaveInLevelCalled){
-			bossNumber = 2;
-			yEnemyPosition = 190;
-			bossLife = 40;
-			$("#enemy-boss2").css({
-				"background-image" : "url('data/css/boss2.png')",
-				"margin-top":"-150px"
-			}).fadeIn(2000, function(){
-				isBoss = true;
-			}).animate({
-				"margin-top" :"0px"
-			}, 2000, function(){
-				
-			});
-		}else if((level == 9 || level == 18 || level == 27  ) && !secondWaveInLevelCalled){
-			bossNumber = 3;
-			yEnemyPosition = 190;
-			bossLife = 40;
-			$("#enemy-boss3").css({
-				"background-image" : "url('data/css/boss3.png')",
-				"margin-top":"-150px"
-			}).fadeIn(2000, function(){
-				isBoss = true;
-			}).animate({
-				"margin-top" :"0px"
-			}, 2000, function(){
-				
-			});
-		}
-		
-		if(!secondWaveInLevelCalled){
-			
-			$("#enemy-wave").fadeIn(1000, function(){
+	}
+	yEnemyPosition = 40 + (level * 10);
+	directionAnimationBoss = -1;
+	// Ajout du boss s'il existe
+	if ((level == 3 || level == 12 || level == 21) && !secondWaveInLevelCalled) {
+		bossNumber = 1;
+		bossLife = 20;
+		secondWaveInLevel = true;
+		$("#enemy-boss1").css({
+			"background-image" : "url('data/css/boss1.png')",
+			"margin-top" : "-150px"
+		}).fadeIn(1500, function() {
+			isBoss = true;
+		}).animate({
+			"margin-top" : "0px"
+		}, 1500, function() {
+
+		});
+	} else if ((level == 6 || level == 15 || level == 24)
+			&& !secondWaveInLevelCalled) {
+		bossNumber = 2;
+		yEnemyPosition = 190;
+		bossLife = 40;
+		$("#enemy-boss2").css({
+			"background-image" : "url('data/css/boss2.png')",
+			"margin-top" : "-150px"
+		}).fadeIn(2000, function() {
+			isBoss = true;
+		}).animate({
+			"margin-top" : "0px"
+		}, 2000, function() {
+
+		});
+	} else if ((level == 9 || level == 18 || level == 27)
+			&& !secondWaveInLevelCalled) {
+		bossNumber = 3;
+		yEnemyPosition = 190;
+		bossLife = 40;
+		$("#enemy-boss3").css({
+			"background-image" : "url('data/css/boss3.png')",
+			"margin-top" : "-150px"
+		}).fadeIn(2000, function() {
+			isBoss = true;
+		}).animate({
+			"margin-top" : "0px"
+		}, 2000, function() {
+
+		});
+	}
+	
+	
+
+	if (!secondWaveInLevelCalled) {
+
+		$("#enemy-wave").fadeIn(1000, function() {
+			isCreatingNewWave = false;
+		});
+
+	} else {
+		secondWaveInLevel = true;
+		yEnemyPosition = 40 + (level * 10);
+		setTimeout(function() {
+			$("#enemy-wave").fadeIn(1000, function() {
 				isCreatingNewWave = false;
 			});
-			
-		}else{
-			secondWaveInLevel = true;
-			yEnemyPosition = 40 + (level*10);
-			setTimeout(function(){$("#enemy-wave").fadeIn(1000, function(){
-				isCreatingNewWave = false;
-			});
-			},100);
-		}
+		}, 100);
+	}
 }
 
-
-function createEnemy(i,j){
+function createEnemy(i, j) {
 	var result = Math.floor((Math.random() * 2) + 1);
 	if (result == 1) {
-	
+
 		var idenemy = "enemy-" + i + "-" + j;
 		$('<div></div>').attr('id', idenemy).addClass('enemy').css({
 			left : 90 + (j * 145) + "px",
 			top : (i * 100) + "px"
 		}).appendTo($('#enemy-wave'));
 		enemysShip[idenemy] = true;
-	}else{
+	} else {
 		var idenemy = "enemy-" + i + "-" + j;
 		$('<div></div>').attr('id', idenemy).addClass('enemy2').css({
 			left : 90 + (j * 145) + "px",
@@ -506,7 +916,7 @@ function launchEnemyMove() {
 }
 
 function moveEnemyWave() {
-	if(!isCreatingNewWave){
+	if (!isCreatingNewWave) {
 		yEnemyPosition += 15;
 		$("#enemy-wave").animate({
 			"top" : yEnemyPosition + "px",
@@ -518,18 +928,18 @@ function moveEnemyWave() {
 				"top" : yEnemyPosition + "px",
 				"left" : "+=" + (directionAnimation * 15)
 			}, 200, function() {
-				if(isCreatingNewWave){
-					yEnemyPosition = 40 + (level*10);
+				if (isCreatingNewWave) {
+					yEnemyPosition = 40 + (level * 10);
 				}
 			});
 		});
-	}else{
-		yEnemyPosition = 40 + (level*10);
-		//console.log("yEnemyPosition : " + yEnemyPosition);
+	} else {
+		yEnemyPosition = 40 + (level * 10);
+		// console.log("yEnemyPosition : " + yEnemyPosition);
 	}
 }
 
-//---- handle the move of the bloc boss
+// ---- handle the move of the bloc boss
 var moveBossWaveThread = "";
 function launchBossMove() {
 	moveBossWaveThread = setInterval(function() {
@@ -539,8 +949,8 @@ function launchBossMove() {
 }
 
 function moveBossWave() {
-	if(isBoss){
-	
+	if (isBoss) {
+
 		$("#enemy-boss" + bossNumber).animate({
 			"left" : "+=" + (directionAnimationBoss * 550)
 		}, 4500, function() {
@@ -550,10 +960,9 @@ function moveBossWave() {
 				directionAnimationBoss = directionAnimationBoss * -1;
 			});
 		});
-	
+
 	}
 }
-
 
 // ---- handle the move of the bloc enemys
 var shotEnemyThread = "";
@@ -571,9 +980,9 @@ function shotEnemy() {
 		for (j = 0; j < 11; j++) {
 			var idenemy = "enemy-" + i + "-" + j;
 			if (enemysShip[idenemy] == true) {
-				var coeff =  (level / 2);
-				if(coeff > 5){
-					coeff=5;
+				var coeff = (level / 2);
+				if (coeff > 5) {
+					coeff = 5;
 				}
 				var result = Math.floor((Math.random() * 7 - coeff) + 1);
 				if (result == 1) {
@@ -589,24 +998,28 @@ function shotEnemy() {
 										top : 1500
 									},
 									{
-										duration : 1500,
+										duration : 1500 - (level * 40),
 										easing : 'linear',
 										step : function(now, fx) {
-											var yBullet = parseInt($(this).css(
-													"bottom").replace("px", ""));
-											var xBullet = parseInt($(this).css(
-													"left").replace("px", ""));
-											var xShip = parseInt($("#ship")
-													.css("left").replace("px",
-															""));
-											if (yBullet <= 90 && yBullet > 10) {
-												if (xBullet >= xShip
-														&& (xBullet - 10) <= (xShip + 75)) {
-													shipTouched();
-													$(this).remove();
+											if(!shield){
+												var yBullet = parseInt($(this).css(
+														"bottom").replace("px", ""));
+												var xBullet = parseInt($(this).css(
+														"left").replace("px", ""));
+												var xShip = parseInt($("#ship")
+														.css("left").replace("px",
+																""));
+												if (yBullet <= 90 && yBullet > 10) {
+													if (xBullet >= xShip
+															&& (xBullet - 10) <= (xShip + 75)) {
+														shipTouched();
+														$(this).remove();
+													}
 												}
 											}
 										}
+									}, function(){
+										$(this).remove();
 									});
 					breakPoint = true;
 					break;
@@ -618,114 +1031,131 @@ function shotEnemy() {
 			}
 		}
 	}
-	
+
 }
 
-
-function shotBoss(){
-	if(isBoss){
-		var result = Math.floor((Math.random() * 4) + 1);
+function shotBoss() {
+	if (isBoss) {
+		var result = Math.floor((Math.random() * 9) + 1);
 		if (result < 3) {
-			if(bossNumber == 1){
-				
-				var xBoss = $("#enemy-boss" + bossNumber).css("left").replace("px","");
-				launchBossShot(parseInt(xBoss) + 115,shipYPosition + 262,"-");
-				launchBossShot(parseInt(xBoss) + 125,shipYPosition + 262,"0");
-				launchBossShot(parseInt(xBoss) + 125,shipYPosition + 262,"+");
-				
-				
-			}else if(bossNumber == 2){
-				var xBoss = $("#enemy-boss" + bossNumber).css("left").replace("px","");
-				launchBossShot(parseInt(xBoss) + 115,shipYPosition + 262,"-");
-				launchBossShot(parseInt(xBoss) + 115,shipYPosition + 262,"0");
-				launchBossShot(parseInt(xBoss) + 115,shipYPosition + 262,"+");
-				
+			if (bossNumber == 1) {
+
+				var xBoss = $("#enemy-boss" + bossNumber).css("left").replace(
+						"px", "");
+				launchBossShot(parseInt(xBoss) + 115, shipYPosition + 262, "-");
+				launchBossShot(parseInt(xBoss) + 125, shipYPosition + 262, "0");
+				launchBossShot(parseInt(xBoss) + 125, shipYPosition + 262, "+");
+
+			} else if (bossNumber == 2) {
+				var xBoss = $("#enemy-boss" + bossNumber).css("left").replace(
+						"px", "");
+				launchBossShot(parseInt(xBoss) + 115, shipYPosition + 262, "-");
+				launchBossShot(parseInt(xBoss) + 115, shipYPosition + 262, "0");
+				launchBossShot(parseInt(xBoss) + 115, shipYPosition + 262, "+");
+
+			} else if (bossNumber == 3) {
+				var xBoss = $("#enemy-boss" + bossNumber).css("left").replace(
+						"px", "");
+				launchBossShot(parseInt(xBoss) + 115, shipYPosition + 262, "-");
+				launchBossShot(parseInt(xBoss) + 115, shipYPosition + 262, "0");
+				launchBossShot(parseInt(xBoss) + 115, shipYPosition + 262, "+");
 			}
-		}else{
-			if(bossNumber == 1){
-				var xBoss = $("#enemy-boss" + bossNumber).css("left").replace("px","");
-				
-				launchBossShot(parseInt(xBoss) + 365,shipYPosition + 262,"-");
-				launchBossShot(parseInt(xBoss) + 365,shipYPosition + 262,"0");
-				launchBossShot(parseInt(xBoss) + 365,shipYPosition + 262,"+");
-				
-			}else if(bossNumber == 2){
-				var xBoss = $("#enemy-boss" + bossNumber).css("left").replace("px","");
-				launchBossShot(parseInt(xBoss) + 375,shipYPosition + 262,"-");
-				launchBossShot(parseInt(xBoss) + 375,shipYPosition + 262,"0");
-				launchBossShot(parseInt(xBoss) + 375,shipYPosition + 262,"+");
+		} else if(result < 5){
+			if (bossNumber == 1) {
+				var xBoss = $("#enemy-boss" + bossNumber).css("left").replace(
+						"px", "");
+
+				launchBossShot(parseInt(xBoss) + 365, shipYPosition + 262, "-");
+				launchBossShot(parseInt(xBoss) + 365, shipYPosition + 262, "0");
+				launchBossShot(parseInt(xBoss) + 365, shipYPosition + 262, "+");
+
+			} else if (bossNumber == 2) {
+				var xBoss = $("#enemy-boss" + bossNumber).css("left").replace(
+						"px", "");
+				launchBossShot(parseInt(xBoss) + 375, shipYPosition + 262, "-");
+				launchBossShot(parseInt(xBoss) + 375, shipYPosition + 262, "0");
+				launchBossShot(parseInt(xBoss) + 375, shipYPosition + 262, "+");
+			} else if (bossNumber == 3) {
+				var xBoss = $("#enemy-boss" + bossNumber).css("left").replace(
+						"px", "");
+				launchBossShot(parseInt(xBoss) + 375, shipYPosition + 262, "-");
+				launchBossShot(parseInt(xBoss) + 375, shipYPosition + 262, "0");
+				launchBossShot(parseInt(xBoss) + 375, shipYPosition + 262, "+");
 			}
 		}
 		
+		if(result == 7 || result == 8){
 		
-		//Dans tous les cas si on est sur le boss 2 :
-		if(bossNumber == 2){
-			var xBoss = $("#enemy-boss" + bossNumber).css("left").replace("px","");
-			launchBossShot(parseInt(xBoss) + 250,shipYPosition + 337,"-");
-			launchBossShot(parseInt(xBoss) + 250,shipYPosition + 387,"0");
-			launchBossShot(parseInt(xBoss) + 250,shipYPosition + 387,"+");
+		// Dans tous les cas si on est sur le boss 2 :
+		if (bossNumber == 2) {
+			var xBoss = $("#enemy-boss" + bossNumber).css("left").replace("px",
+					"");
+			launchBossShot(parseInt(xBoss) + 250, shipYPosition + 337, "-");
+			launchBossShot(parseInt(xBoss) + 250, shipYPosition + 387, "0");
+			launchBossShot(parseInt(xBoss) + 250, shipYPosition + 387, "+");
+		} else if (bossNumber == 3) {
+			var xBoss = $("#enemy-boss" + bossNumber).css("left").replace("px",
+					"");
+			launchBossShot(parseInt(xBoss) + 250, shipYPosition + 337, "-");
+			launchBossShot(parseInt(xBoss) + 250, shipYPosition + 387, "0");
+			launchBossShot(parseInt(xBoss) + 250, shipYPosition + 387, "+");
+		}
+		
 		}
 	}
 }
 
-
-function launchBossShot(i,j,directionx){
-	if(directionx != "0"){
-		$('<div></div>')
-		.addClass('bullet-boss')
-		.css({
+function launchBossShot(i, j, directionx) {
+	if (directionx != "0") {
+		$('<div></div>').addClass('bullet-boss').css({
 			"left" : i + "px",
 			"top" : j + "px"
-		})
-		.appendTo($('#board'))
-		.animate(
+		}).appendTo($('#board')).animate(
 				{
-					left : directionx+"=1500",
+					left : directionx + "=1500",
 					top : "+=1500"
 				},
 				{
-					duration : 2500,
+					duration : 2700 - (level * 40),
 					easing : 'linear',
 					step : function(now, fx) {
-						var yBullet = parseInt($(this).css(
-								"bottom").replace("px", ""));
-						var xBullet = parseInt($(this).css(
-								"left").replace("px", ""));
-						var xShip = parseInt($("#ship")
-								.css("left").replace("px",
-										""));
-						if (yBullet <= 90 && yBullet > 10) {
-							if (xBullet >= xShip
-									&& (xBullet - 10) <= (xShip + 75)) {
-								shipTouched();
-								$(this).remove();
+						if(!shield){
+							var yBullet = parseInt($(this).css("bottom").replace(
+									"px", ""));
+							var xBullet = parseInt($(this).css("left").replace(
+									"px", ""));
+							var xShip = parseInt($("#ship").css("left").replace(
+									"px", ""));
+							if (yBullet <= 90 && yBullet > 10) {
+								if (xBullet >= xShip
+										&& (xBullet - 10) <= (xShip + 75)) {
+									shipTouched();
+									$(this).remove();
+								}
 							}
 						}
 					}
+				}, function(){
+					$(this).remove();
 				});
-	}else{
-		$('<div></div>')
-		.addClass('bullet-boss')
-		.css({
+	} else {
+		$('<div></div>').addClass('bullet-boss').css({
 			"left" : i + "px",
 			"top" : j + "px"
-		})
-		.appendTo($('#board'))
-		.animate(
+		}).appendTo($('#board')).animate(
 				{
 					top : "+=1500"
 				},
 				{
-					duration : 2500,
+					duration : 2700 - (level * 40),
 					easing : 'linear',
 					step : function(now, fx) {
-						var yBullet = parseInt($(this).css(
-						"bottom").replace("px", ""));
-						var xBullet = parseInt($(this).css(
-								"left").replace("px", ""));
-						var xShip = parseInt($("#ship")
-								.css("left").replace("px",
-										""));
+						var yBullet = parseInt($(this).css("bottom").replace(
+								"px", ""));
+						var xBullet = parseInt($(this).css("left").replace(
+								"px", ""));
+						var xShip = parseInt($("#ship").css("left").replace(
+								"px", ""));
 						if (yBullet <= 90 && yBullet > 10) {
 							if (xBullet >= xShip
 									&& (xBullet - 10) <= (xShip + 75)) {
@@ -734,14 +1164,16 @@ function launchBossShot(i,j,directionx){
 							}
 						}
 					}
+				}, function(){
+					$(this).remove();
 				});
 	}
-	
+
 }
 // ---- is gonna check every enemys of this wave...
 // if they are all dead it means that the level is done
 function checkEnemys() {
-	
+
 	var allDead = true;
 	for (i = 0; i < 5; i++) {
 		for (j = 0; j < 11; j++) {
@@ -756,40 +1188,40 @@ function checkEnemys() {
 		}
 	}
 
-	if (allDead  && !isBoss && !isCreatingNewWave && secondWaveInLevel) {
-		
+	if (allDead && !isBoss && !isCreatingNewWave && secondWaveInLevel) {
+
 		isCreatingNewWave = true;
 		secondWaveInLevelCalled = false;
 		$("#enemy-wave").css({
 			"display" : "none"
 		});
 		$("#level-number").empty().append(level);
-		$("#level-number-next").empty().append((level)+1);
+		$("#level-number-next").empty().append((level) + 1);
 		$("#message").fadeIn(500);
 		setTimeout(function() {
 			$("#message").fadeOut(500);
 		}, 2000);
-		
-		yEnemyPosition = 40 + (level*10);
-		
-		//clearInterval(moveEnemyWaveThread);
+
+		yEnemyPosition = 40 + (level * 10);
+
+		// clearInterval(moveEnemyWaveThread);
 		setTimeout(function() {
-			if(isCreatingNewWave){
+			if (isCreatingNewWave) {
 				createEnemysWave();
 			}
 		}, 3100);
-			
+
 	}
-	
-	if (allDead  && !isBoss && !isCreatingNewWave && !secondWaveInLevel) {
+
+	if (allDead && !isBoss && !isCreatingNewWave && !secondWaveInLevel) {
 		$("#enemy-wave").css({
 			"display" : "none"
 		});
 		secondWaveInLevelCalled = true;
 		isCreatingNewWave = true;
-		yEnemyPosition = 40 + (level*10);
+		yEnemyPosition = 40 + (level * 10);
 		setTimeout(function() {
-			if(isCreatingNewWave){
+			if (isCreatingNewWave) {
 				createEnemysWave();
 			}
 		}, 1000);
@@ -808,7 +1240,7 @@ function launchGame() {
 	$("#lifes").css({
 		"display" : "inline"
 	});
-	level = 14;
+	level = 0	;
 	gameLaunched = true;
 	current_screen = 1;
 	createEnemysWave();
@@ -856,12 +1288,11 @@ function checkWave() {
 	}
 }
 
-function shipTouched(){
-	$("#hurt").fadeIn(200)
-	.fadeOut(200);
+function shipTouched() {
+	$("#hurt").fadeIn(200).fadeOut(200);
 	lifes--;
-	$("#lifes").css("width",(lifes * 42)+"px")
-	if(lifes == 0){
+	$("#lifes").css("width", (lifes * 42) + "px")
+	if (lifes == 0) {
 		gameOver();
 	}
 }
@@ -906,13 +1337,15 @@ function launchBackgroundAnimation() {
 	}, 50);
 	setInterval(function() {
 		backgroundPositionplanet += 2;
-		$("#bg-planet").css({
-			"background-position" : ("center " + backgroundPositionplanet + "px")
-		}, function() {
-			if (backgroundPositionplanet == 8000) {
-				backgroundPositionplanet = 0;
-			}
-		});
+		$("#bg-planet").css(
+				{
+					"background-position" : ("center "
+							+ backgroundPositionplanet + "px")
+				}, function() {
+					if (backgroundPositionplanet == 8000) {
+						backgroundPositionplanet = 0;
+					}
+				});
 	}, 50);
 }
 
