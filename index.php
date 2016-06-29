@@ -8,7 +8,7 @@
 </head>
 <body>
  <audio controls style="display:none;" id="music1">
-  	<source src="data/sounds/music1.wav" type="audio/wav" >
+  	<source src="data/sounds/music1.mp3" type="audio/mp3" >
   		Your browser does not support the audio element.
 	</audio> 
 	
