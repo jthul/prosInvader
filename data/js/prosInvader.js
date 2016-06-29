@@ -17,6 +17,8 @@ var shipXPosition = 650;
 // ---- Is going to manage the ship animation (for the engine flame)
 var shipImgCpt = 1;
 
+var secondWaveInLevel = false;
+var secondWaveInLevelCalled = false;
 // ---- is going to manage the enemys (type 1)
 var enemysShip = [];
 // ---- is going to manage the yPosition of the ennemy block
@@ -30,7 +32,7 @@ var directionAnimationBoss = -1;
 // ---- to manage the game
 var score = 0;
 var level = 0;
-var SHIP_SPEED = 1200;
+var SHIP_SPEED = 800;
 var gameLaunched = false;
 var lifes = 3;
 var gun = 1 // 1 : normal ; 2 : 3-shot ; 3 : rifle
@@ -53,7 +55,7 @@ var boom, boom2, boom3 = "";
 var cptBoom = 1;
 var gameover = "";
 
-var bossWidth = [257,0,0];
+var bossWidth = [257,320,300];
 
 $(document).ready(function() {
 	// Is going to set the right height for the board
@@ -130,6 +132,7 @@ $(document).ready(function() {
 	}, 100);
 	
 	launchBackgroundAnimation();
+	launchBossMove();
 	majUIMenu();
 	 laser = document.createElement('audio');
      laser.setAttribute('src', 'data/sounds/laser.wav');
@@ -324,13 +327,16 @@ function bossTouched(){
 // -- ia methods :
 // ---- create a wave of classic enemys
 function createEnemysWave() {
-	if(!isCreatingNewWave){
 		enemysShip = [];
 		isCreatingNewWave = true;
-		level++;
+		if(secondWaveInLevel || level == 0){
+			level++;
+			secondWaveInLevel = false;
+		}
+		
 		$("#enemy-wave").empty();
 		$("#enemy-wave").css({
-			"top" : "40px"
+			"top" : ((40 + (level*10))+"px")
 		})
 		for (i = 0; i < 5; i++) {
 			for (j = 0; j < 11; j++) {
@@ -338,7 +344,7 @@ function createEnemysWave() {
 				/*
 				 * LEVEL 1 
 				 */
-				if(level == 1 ){
+				if(level == 1 || level == 8 || level==14 || level ==13){
 					if(i < 3 && j > 2 && j < 9 ){
 						createEnemy(i,j);
 					}else{
@@ -384,7 +390,7 @@ function createEnemysWave() {
 				 * LEVEL 5 
 				 */
 				else if(level == 5){
-					if(j > 1 && j < 10 ){
+					if(i<4){
 						createEnemy(i,j);
 					}else{
 						var idenemy = "enemy-" + i + "-" + j;
@@ -395,7 +401,12 @@ function createEnemysWave() {
 				 * BOSS 2
 				 */
 				else if(level == 6){
-					createEnemy(i,j);
+					if(i > 1 ){
+						createEnemy(i,j);
+					}else{
+						var idenemy = "enemy-" + i + "-" + j;
+						enemysShip[idenemy] = false;
+					}
 				}
 				else{
 					
@@ -403,31 +414,88 @@ function createEnemysWave() {
 				}
 			}
 		}
-		
+		yEnemyPosition = 40 + (level*10);
+		directionAnimationBoss = -1;
 		// Ajout du boss s'il existe
-		if(level == 3){
-			isBoss = true;
+		if((level == 3 || level == 12 || level == 21) && !secondWaveInLevelCalled){
+			bossNumber = 1;
+			bossLife = 20;
+			secondWaveInLevel = true;
 			$("#enemy-boss1").css({
-				"background-image" : "url('data/css/boss1.png')"
-			}).fadeIn(1000, function(){
-				launchBossMove();
+				"background-image" : "url('data/css/boss1.png')",
+				"margin-top":"-150px"
+			}).fadeIn(1500, function(){
+				isBoss = true;
+			}).animate({
+				"margin-top" :"0px"
+			}, 1500, function(){
+				
+			});
+		}else if((level == 6 || level == 15 || level == 24  ) && !secondWaveInLevelCalled){
+			bossNumber = 2;
+			yEnemyPosition = 190;
+			bossLife = 40;
+			$("#enemy-boss2").css({
+				"background-image" : "url('data/css/boss2.png')",
+				"margin-top":"-150px"
+			}).fadeIn(2000, function(){
+				isBoss = true;
+			}).animate({
+				"margin-top" :"0px"
+			}, 2000, function(){
+				
+			});
+		}else if((level == 9 || level == 18 || level == 27  ) && !secondWaveInLevelCalled){
+			bossNumber = 3;
+			yEnemyPosition = 190;
+			bossLife = 40;
+			$("#enemy-boss3").css({
+				"background-image" : "url('data/css/boss3.png')",
+				"margin-top":"-150px"
+			}).fadeIn(2000, function(){
+				isBoss = true;
+			}).animate({
+				"margin-top" :"0px"
+			}, 2000, function(){
+				
 			});
 		}
 		
-		$("#enemy-wave").fadeIn(1000, function(){
-			isCreatingNewWave = false;
-		});
-	}
+		if(!secondWaveInLevelCalled){
+			
+			$("#enemy-wave").fadeIn(1000, function(){
+				isCreatingNewWave = false;
+			});
+			
+		}else{
+			secondWaveInLevel = true;
+			yEnemyPosition = 40 + (level*10);
+			setTimeout(function(){$("#enemy-wave").fadeIn(1000, function(){
+				isCreatingNewWave = false;
+			});
+			},100);
+		}
 }
 
 
 function createEnemy(i,j){
-	var idenemy = "enemy-" + i + "-" + j;
-	$('<div></div>').attr('id', idenemy).addClass('enemy').css({
-		left : 90 + (j * 145) + "px",
-		top : (i * 100) + "px"
-	}).appendTo($('#enemy-wave'));
-	enemysShip[idenemy] = true;
+	var result = Math.floor((Math.random() * 2) + 1);
+	if (result == 1) {
+	
+		var idenemy = "enemy-" + i + "-" + j;
+		$('<div></div>').attr('id', idenemy).addClass('enemy').css({
+			left : 90 + (j * 145) + "px",
+			top : (i * 100) + "px"
+		}).appendTo($('#enemy-wave'));
+		enemysShip[idenemy] = true;
+	}else{
+		var idenemy = "enemy-" + i + "-" + j;
+		$('<div></div>').attr('id', idenemy).addClass('enemy2').css({
+			left : 90 + (j * 145) + "px",
+			top : (i * 100) + "px"
+		}).appendTo($('#enemy-wave'));
+		enemysShip[idenemy] = true;
+	}
 }
 // ---- handle the move of the bloc enemys
 var moveEnemyWaveThread = "";
@@ -450,11 +518,13 @@ function moveEnemyWave() {
 				"top" : yEnemyPosition + "px",
 				"left" : "+=" + (directionAnimation * 15)
 			}, 200, function() {
-				
+				if(isCreatingNewWave){
+					yEnemyPosition = 40 + (level*10);
+				}
 			});
 		});
 	}else{
-		yEnemyPosition = 40;
+		yEnemyPosition = 40 + (level*10);
 		//console.log("yEnemyPosition : " + yEnemyPosition);
 	}
 }
@@ -469,15 +539,19 @@ function launchBossMove() {
 }
 
 function moveBossWave() {
-	$("#enemy-boss" + bossNumber).animate({
-		"left" : "+=" + (directionAnimationBoss * 550)
-	}, 4500, function() {
+	if(isBoss){
+	
 		$("#enemy-boss" + bossNumber).animate({
-			"left" : "-=" + (directionAnimationBoss * 550)
+			"left" : "+=" + (directionAnimationBoss * 550)
 		}, 4500, function() {
-			directionAnimationBoss = directionAnimationBoss * -1;
+			$("#enemy-boss" + bossNumber).animate({
+				"left" : "-=" + (directionAnimationBoss * 550)
+			}, 4500, function() {
+				directionAnimationBoss = directionAnimationBoss * -1;
+			});
 		});
-	});
+	
+	}
 }
 
 
@@ -486,17 +560,22 @@ var shotEnemyThread = "";
 function launchEnemyShot() {
 	shotEnemyThread = setInterval(function() {
 		shotEnemy()
-	}, 700);
+	}, 500);
 }
 
 // ---- is gonna be the enemy shotter
 function shotEnemy() {
+	shotBoss();
 	var breakPoint = false;
 	for (i = 0; i < 5; i++) {
 		for (j = 0; j < 11; j++) {
 			var idenemy = "enemy-" + i + "-" + j;
 			if (enemysShip[idenemy] == true) {
-				var result = Math.floor((Math.random() * 12) + 1);
+				var coeff =  (level / 2);
+				if(coeff > 5){
+					coeff=5;
+				}
+				var result = Math.floor((Math.random() * 7 - coeff) + 1);
 				if (result == 1) {
 					$('<div></div>')
 							.addClass('bullet-enemy')
@@ -539,7 +618,7 @@ function shotEnemy() {
 			}
 		}
 	}
-	shotBoss();
+	
 }
 
 
@@ -548,142 +627,117 @@ function shotBoss(){
 		var result = Math.floor((Math.random() * 4) + 1);
 		if (result < 3) {
 			if(bossNumber == 1){
+				
 				var xBoss = $("#enemy-boss" + bossNumber).css("left").replace("px","");
+				launchBossShot(parseInt(xBoss) + 115,shipYPosition + 262,"-");
+				launchBossShot(parseInt(xBoss) + 125,shipYPosition + 262,"0");
+				launchBossShot(parseInt(xBoss) + 125,shipYPosition + 262,"+");
 				
-				// SHOT 1
 				
-				$('<div></div>')
-				.addClass('bullet-boss')
-				.css({
-					"left" : (parseInt(xBoss) + 125) + "px",
-					"top" : shipYPosition + 262 + "px"
-				})
-				.appendTo($('#board'))
-				.animate(
-						{
-							left : "-=1500",
-							top : "+=1500"
-						},
-						{
-							duration : 2500,
-							easing : 'linear',
-							step : function(now, fx) {
-								
-							}
-						});
-				
-				$('<div></div>')
-				.addClass('bullet-boss')
-				.css({
-					"left" : (parseInt(xBoss) + 125)+ "px",
-					"top" : shipYPosition + 262 + "px"
-				})
-				.appendTo($('#board'))
-				.animate(
-						{
-							top : "+=1500"
-						},
-						{
-							duration : 2500,
-							easing : 'linear',
-							step : function(now, fx) {
-								
-							}
-						});
-				
-				$('<div></div>')
-				.addClass('bullet-boss')
-				.css({
-					"left" :(parseInt(xBoss) + 125) + "px",
-					"top" : shipYPosition + 262 + "px"
-				})
-				.appendTo($('#board'))
-				.animate(
-						{
-							left : "+=1500",
-							top : "+=1500"
-						},
-						{
-							duration : 2500,
-							easing : 'linear',
-							step : function(now, fx) {
-								
-							}
-						});
+			}else if(bossNumber == 2){
+				var xBoss = $("#enemy-boss" + bossNumber).css("left").replace("px","");
+				launchBossShot(parseInt(xBoss) + 115,shipYPosition + 262,"-");
+				launchBossShot(parseInt(xBoss) + 115,shipYPosition + 262,"0");
+				launchBossShot(parseInt(xBoss) + 115,shipYPosition + 262,"+");
 				
 			}
-			
-			
-			
 		}else{
 			if(bossNumber == 1){
 				var xBoss = $("#enemy-boss" + bossNumber).css("left").replace("px","");
 				
-				// SHOT 1
+				launchBossShot(parseInt(xBoss) + 365,shipYPosition + 262,"-");
+				launchBossShot(parseInt(xBoss) + 365,shipYPosition + 262,"0");
+				launchBossShot(parseInt(xBoss) + 365,shipYPosition + 262,"+");
 				
-				$('<div></div>')
-				.addClass('bullet-boss')
-				.css({
-					"left" : (parseInt(xBoss) + 365) + "px",
-					"top" : shipYPosition + 262 + "px"
-				})
-				.appendTo($('#board'))
-				.animate(
-						{
-							left : "-=1500",
-							top : "+=1500"
-						},
-						{
-							duration : 2500,
-							easing : 'linear',
-							step : function(now, fx) {
-								
-							}
-						});
-				
-				$('<div></div>')
-				.addClass('bullet-boss')
-				.css({
-					"left" : (parseInt(xBoss) + 365)+ "px",
-					"top" : shipYPosition + 262 + "px"
-				})
-				.appendTo($('#board'))
-				.animate(
-						{
-							top : "+=1500"
-						},
-						{
-							duration : 2500,
-							easing : 'linear',
-							step : function(now, fx) {
-								
-							}
-						});
-				
-				$('<div></div>')
-				.addClass('bullet-boss')
-				.css({
-					"left" :(parseInt(xBoss) + 365) + "px",
-					"top" : shipYPosition + 262 + "px"
-				})
-				.appendTo($('#board'))
-				.animate(
-						{
-							left : "+=1500",
-							top : "+=1500"
-						},
-						{
-							duration : 2500,
-							easing : 'linear',
-							step : function(now, fx) {
-								
-							}
-						});
+			}else if(bossNumber == 2){
+				var xBoss = $("#enemy-boss" + bossNumber).css("left").replace("px","");
+				launchBossShot(parseInt(xBoss) + 375,shipYPosition + 262,"-");
+				launchBossShot(parseInt(xBoss) + 375,shipYPosition + 262,"0");
+				launchBossShot(parseInt(xBoss) + 375,shipYPosition + 262,"+");
 			}
+		}
+		
+		
+		//Dans tous les cas si on est sur le boss 2 :
+		if(bossNumber == 2){
+			var xBoss = $("#enemy-boss" + bossNumber).css("left").replace("px","");
+			launchBossShot(parseInt(xBoss) + 250,shipYPosition + 337,"-");
+			launchBossShot(parseInt(xBoss) + 250,shipYPosition + 387,"0");
+			launchBossShot(parseInt(xBoss) + 250,shipYPosition + 387,"+");
 		}
 	}
 }
 
+
+function launchBossShot(i,j,directionx){
+	if(directionx != "0"){
+		$('<div></div>')
+		.addClass('bullet-boss')
+		.css({
+			"left" : i + "px",
+			"top" : j + "px"
+		})
+		.appendTo($('#board'))
+		.animate(
+				{
+					left : directionx+"=1500",
+					top : "+=1500"
+				},
+				{
+					duration : 2500,
+					easing : 'linear',
+					step : function(now, fx) {
+						var yBullet = parseInt($(this).css(
+								"bottom").replace("px", ""));
+						var xBullet = parseInt($(this).css(
+								"left").replace("px", ""));
+						var xShip = parseInt($("#ship")
+								.css("left").replace("px",
+										""));
+						if (yBullet <= 90 && yBullet > 10) {
+							if (xBullet >= xShip
+									&& (xBullet - 10) <= (xShip + 75)) {
+								shipTouched();
+								$(this).remove();
+							}
+						}
+					}
+				});
+	}else{
+		$('<div></div>')
+		.addClass('bullet-boss')
+		.css({
+			"left" : i + "px",
+			"top" : j + "px"
+		})
+		.appendTo($('#board'))
+		.animate(
+				{
+					top : "+=1500"
+				},
+				{
+					duration : 2500,
+					easing : 'linear',
+					step : function(now, fx) {
+						var yBullet = parseInt($(this).css(
+						"bottom").replace("px", ""));
+						var xBullet = parseInt($(this).css(
+								"left").replace("px", ""));
+						var xShip = parseInt($("#ship")
+								.css("left").replace("px",
+										""));
+						if (yBullet <= 90 && yBullet > 10) {
+							if (xBullet >= xShip
+									&& (xBullet - 10) <= (xShip + 75)) {
+								shipTouched();
+								$(this).remove();
+							}
+						}
+					}
+				});
+	}
+	
+}
 // ---- is gonna check every enemys of this wave...
 // if they are all dead it means that the level is done
 function checkEnemys() {
@@ -702,8 +756,10 @@ function checkEnemys() {
 		}
 	}
 
-	if (allDead  && !isBoss) {
+	if (allDead  && !isBoss && !isCreatingNewWave && secondWaveInLevel) {
 		
+		isCreatingNewWave = true;
+		secondWaveInLevelCalled = false;
 		$("#enemy-wave").css({
 			"display" : "none"
 		});
@@ -712,16 +768,31 @@ function checkEnemys() {
 		$("#message").fadeIn(500);
 		setTimeout(function() {
 			$("#message").fadeOut(500);
-		}, 3000);
+		}, 2000);
 		
-		yEnemyPosition = 40;
+		yEnemyPosition = 40 + (level*10);
 		
 		//clearInterval(moveEnemyWaveThread);
 		setTimeout(function() {
+			if(isCreatingNewWave){
+				createEnemysWave();
+			}
+		}, 3100);
 			
-			createEnemysWave();
-			
-		}, 4000);
+	}
+	
+	if (allDead  && !isBoss && !isCreatingNewWave && !secondWaveInLevel) {
+		$("#enemy-wave").css({
+			"display" : "none"
+		});
+		secondWaveInLevelCalled = true;
+		isCreatingNewWave = true;
+		yEnemyPosition = 40 + (level*10);
+		setTimeout(function() {
+			if(isCreatingNewWave){
+				createEnemysWave();
+			}
+		}, 1000);
 	}
 }
 
@@ -737,7 +808,7 @@ function launchGame() {
 	$("#lifes").css({
 		"display" : "inline"
 	});
-	level = 0;
+	level = 14;
 	gameLaunched = true;
 	current_screen = 1;
 	createEnemysWave();

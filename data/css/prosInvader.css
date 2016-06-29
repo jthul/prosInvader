@@ -12,13 +12,17 @@ html, body{background:black;padding:0px;margin:0px;font-family:prosInvader;}
 #enemy-wave{position:absolute;height:600px;left:100px;top:40px;display:none;z-index:2;}
 #score{position:absolute;right:10px;top:5px;font-size:21px;color:white;z-index:10;display:none;}
 #gameOver{text-shadow: 5px 5px #FF0000;position:absolute;width:1920px;margin-top:180px;text-align:center;font-size:85px;color:yellow;line-height: 155px;display:none;z-index:6;}
-#message{text-shadow: 5px 5px #FF0000;position:absolute;width:1920px;margin-top:180px;text-align:center;font-size:85px;color:yellow;line-height: 155px;display:none;}
+#message{text-shadow: 5px 5px #FF0000;position:absolute;width:1920px;margin-top:80px;text-align:center;font-size:85px;color:yellow;line-height: 155px;display:none;}
 #level-number{color:red;font-size:100px}
 #lifes{position:absolute;width:126px;height:45px;background:url("ship_life.png");right:0px;top:35px; display:none;}
 #logo{position:absolute;width:1920px;height:554px;background-image: url('logoTshirt.png');z-index:2;background-repeat:no-repeat;background-position:center;}
 #menu{width:1920px; text-align:center; color:white; margin-top:570px; font-size:35px; }
 #boss{width:100%; height:300pxpx;position:absolute;}
 #enemy-boss1{width:500px;height:282px;display:none;position:absolute;left:760px;background-position:bottom;background-repeat:no-repeat;}
+
+#enemy-boss2{width:500px;height:369px;display:none;position:absolute;left:760px;background-position:bottom;background-repeat:no-repeat;}
+
+#enemy-boss3{width:500px;height:330px;display:none;position:absolute;left:760px;background-position:bottom;background-repeat:no-repeat;}
 
 ul{list-style:none;}
 li{margin-top:25px;}
@@ -29,6 +33,7 @@ li{margin-top:25px;}
 .bullet-enemy {position:absolute;	width:20px;height:13px;background:url("bulletboss.png");z-index:0;border-radius:50%;}
 .bullet-boss{position:absolute;	width:20px;height:13px;background:red;background:url("bulletboss.png");z-index:1;}
 .enemy{position:absolute;width:90px;height:90px;background-color:red;background:url("ship_enemy.png");z-index:4;}
+.enemy2{position:absolute;width:90px;height:90px;background-color:red;background:url("ship_enemy_2.png");z-index:4;}
 .bigmessage{font-size:120px;}
 #calque{width:100%;height:100%;background:gray;opacity:0.5;z-index:5;display:none;}
 #hurt{width:100%;height:100%;background:red;opacity:0.5;z-index:5;display:none;position:absolute;top:0px;}
